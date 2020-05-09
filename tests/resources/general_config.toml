@@ -1,0 +1,22 @@
+[general]
+blacklist = ['blacklisted']
+
+[stat_plugins_schedule]
+schedule_mode = 'date'
+run_date = '2018-01-01 00:00:04'
+timezone = 'UTC'
+
+[dry_run]
+enable = false
+plugins = []
+
+[plugin_schedule]
+[plugin_schedule.sayaka]
+schedule_mode = 'date'
+run_date = '2018-01-01 00:00:02'
+timezone = 'UTC'
+
+[plugin_schedule.mami]
+schedule_mode = 'date'
+run_date = '2018-01-01 00:00:06'
+timezone = 'UTC'

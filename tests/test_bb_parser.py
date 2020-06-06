@@ -50,7 +50,7 @@ class TestBBRegistry():
         assert r['tag_name'] == 'test' and r['john'] == True
         assert r['obj'].a == 1
 
-    @mock.patch('meguca.plugins.src.dispatch_updater.utils.load_module')
+    @mock.patch('nsadm.utils.load_module')
     def test_init_complex_formatters(self, mock):
         ins = bb_parser.BBRegistry
 
@@ -70,7 +70,7 @@ class TestBBRegistry():
         assert r[0]['obj'].config == {'foo': 'bar', 'loo': 'var'}
         assert r[1]['obj'].config == {'foo2': 'bar2', 'loo2': 'var2'}
 
-    @mock.patch('meguca.plugins.src.dispatch_updater.utils.load_module')
+    @mock.patch('nsadm.utils.load_module')
     def test_init_complex_formatters_with_non_existent_config(self, mock):
         ins = bb_parser.BBRegistry
 
@@ -88,8 +88,7 @@ class TestBBRegistry():
         assert not hasattr(r[0]['obj'], 'config')
         assert not hasattr(r[1]['obj'], 'config')
 
-    @mock.patch('meguca.plugins.src.dispatch_updater.utils.load_module',
-                side_effect=FileNotFoundError)
+    @mock.patch('nsadm.utils.load_module', side_effect=FileNotFoundError)
     def test_init_complex_formatters_with_non_existent_file(self, mock):
         ins = bb_parser.BBRegistry()
 

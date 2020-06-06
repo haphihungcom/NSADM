@@ -19,28 +19,28 @@ class DispatchAPIError(NSADMError):
     pass
 
 
-class DispatchUpload(NSADMError):
+class DispatchUploadingError(NSADMError):
     """Dispatch upload error.
     """
 
     pass
 
 
-class DispatchRenderError(NSADMError):
+class DispatchRenderingError(NSADMError):
     """Dispatch rendering error.
     """
 
     pass
 
 
-class BBParsingError(DispatchRendererError):
+class BBParsingError(DispatchRenderingError):
     """BBCode parsing errors.
     """
 
     pass
 
 
-class TemplateRendererError(DispatchRendererError):
+class TemplateRendererError(DispatchRenderingError):
     """Jinja template rendering errors.
     """
 

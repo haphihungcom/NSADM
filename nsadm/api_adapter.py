@@ -8,13 +8,11 @@ class DispatchAPI():
 
     Args:
         ns_api (nationstates.Nationstates): NationStates API object
-        descriptive_category (bool): Use descriptive category and subcategory name
     """
 
-    def __init__(self, ns_api, descriptive_category=True):
+    def __init__(self, ns_api):
         self.api = ns_api
         self.owner_nation = None
-        self.descriptive_category = descriptive_category
 
     def login(self, owner_nation, password):
         """Send ping to the nation and return X-Pin.
@@ -27,7 +25,7 @@ class DispatchAPI():
         self.owner_nation = self.api.nation(owner_nation, password)
 
         try:
-            resp = self.owner_nation.get_shards('ping', full_response=True)
+            self.owner_nation.get_shards('ping', full_response=True)
         except nationstates.exceptions.Forbidden:
             raise exceptions.DispatchAPIError('Could not log into your nation!')
 

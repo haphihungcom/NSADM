@@ -9,7 +9,7 @@ class DispatchLoaderTest1():
     def __init__(self, config):
         self.config = config
 
-    def get_dispatch_info(self):
+    def get_dispatch_params(self):
         return {'foo1': 'bar1', 'foo2': 'bar2'}
 
     def get_dispatch_text(self, name):
@@ -25,8 +25,8 @@ def init_loader(config):
 
 
 @loader_api.dispatch_loader
-def get_dispatch_info(loader):
-    return loader.get_dispatch_info()
+def get_dispatch_params(loader):
+    return loader.get_dispatch_params()
 
 
 @loader_api.dispatch_loader

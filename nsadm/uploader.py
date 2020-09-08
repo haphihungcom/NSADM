@@ -28,63 +28,32 @@ RESERVED_PLACEHOLDER = "[reserved]"
                     raise exceptions.DispatchAPIError('Non-existent category or subcategory name')"""
 
 
-class DispatchUploader():
-    """Dispatch Uploader"""
+class DispatchUpdater():
+    def __init__(self, api, loader):
+        self.api = api
+        self.loader = loader
+        self.dispatch_params = self.loader.get_dispatch_params()
 
-    def __init__(self, renderer, ns_site, id_store, dispatch_config):
-        self.ns_site = ns_site
-        self.renderer = renderer
-        self.dispatch_config = dispatch_config
-        self.id_store = id_store
+    def add_dispatch_id(self, resp):
+        self.api.create_dispatch()
+        self.loader.add_dispatch_id()
 
-    def create_dispatch(self, name):
-        """Create a new dispatch.
+    def execute_dispatches(self, dispatches):
+        for dispatch in dispatches:
+            action = dispatch['action']
+            if action == 'create':
+                resp = self.api.create_dispatch()
+                self.add_dispatch_id(resp)
+            elif action == 'delete':
+                self.api.edit_dispatch()
+            elif action == 'update':
+                self.api.delete_dispatch()
 
-        Args:
-            name (str): Dispatch file name.
+    def update_dispatches_by_nation(self, names=None):
+        for nation in self.dispatch_info.keys():
+            self.api.login()
+            dispatches = self.dispatch_info[nation]
+            self.update_dispatches(dispatches)
 
-        Returns:
-            str: HTML response.
-        """
-
-        html = self.post_dispatch(self.dispatch_config[name], RESERVED_PLACEHOLDER)
-        logger.info('Created new dispatch "%s"', name)
-
-        return html
-
-    def update_dispatch(self, name):
-        """Update dispatch.
-
-        Args:
-            name (str): Dispatch file name.
-            config (dict): Dispatch configuration.
-        """
-
-        text = self.renderer.render(name)
-        dispatch_id = self.id_store[name]
-        dispatch_config = self.dispatch_config[name]
-
-        self.post_dispatch(dispatch_config, text, dispatch_id)
-        logger.info('Updated dispatch "%s"', name)
-
-    def post_dispatch(self, config, text, edit_id=None):
-        """Post dispatch.
-
-        Args:
-            config (dict): Dispatch configuration.
-            text (str): Text to post.
-            edit_id (int|None): Dispatch ID. Defaults to None.
-        """
-
-        subcategory_name = "subcategory-{}".format(config['category'])
-        params = {'category': str(config['category']),
-                  subcategory_name: str(config['sub_category']),
-                  'dname': config['title'],
-                  'message': text.encode('windows-1252'),
-                  'submitbutton': '1'}
-
-        if edit_id:
-            params['edit'] = str(edit_id)
-
-        #time.sleep(6)
-        return self.ns_site.execute('lodge_dispatch', params)
+    def update_dispatches(self):
+        pass

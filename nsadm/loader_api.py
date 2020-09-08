@@ -28,8 +28,8 @@ def init_loader(config):
 
 
 @dispatch_loader_specs(firstresult=True)
-def get_dispatch_info(loader):
-    """Get a dict of dispatch information.
+def get_dispatch_params(loader):
+    """Get a dict of dispatch parameters.
 
     Args:
         loader: Loader

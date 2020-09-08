@@ -33,7 +33,7 @@ class BBRegistry():
             kwargs['tag_name'] = tag_name
             cls.complex_formatters.append(kwargs)
 
-            # Returns original class object to make tests on them possible.
+            # Return original class object to make tests on them possible.
             return class_obj
 
         return decorator

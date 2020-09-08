@@ -67,8 +67,8 @@ class DispatchLoader(Loader):
         super(DispatchLoader, self).load_loader()
         self._loader = self.manager.hook.init_loader(config=self.loader_config)
 
-    def get_dispatch_info(self):
-        return self.manager.hook.get_dispatch_info(loader=self._loader)
+    def get_dispatch_params(self):
+        return self.manager.hook.get_dispatch_params(loader=self._loader)
 
     def get_dispatch_text(self, name):
         return self.manager.hook.get_dispatch_text(loader=self._loader, name=name)

@@ -3,7 +3,7 @@ import nationstates
 from nsadm import exceptions
 
 
-class DispatchAPI():
+class GeneralAPIAdapter():
     """NationSates API adapter. All results returned as set.
 
     Args:
@@ -30,24 +30,7 @@ class DispatchAPI():
             raise exceptions.DispatchAPIError('Could not log into your nation!')
 
     def send_command(self, action, mode, **kwargs):
-        """Send dispatch command.
-
-        Args:
-            action (str): Action to perform on dispatch
-            mode (str): Command mode
-
-        Returns:
-            dict: Respond content
-        """
-
-        resp = self.owner_nation.command('dispatch',
-                                         dispatch=action, mode=mode,
-                                         dispatchid=kwargs.get('dispatch_id', None),
-                                         title=kwargs.get('title', None),
-                                         text=kwargs.get('text', None),
-                                         category=kwargs.get('category', None),
-                                         subcategory=kwargs.get('subcategory', None))
-        return resp
+        raise NotImplemented
 
     def prepare_command(self, action, **kwargs):
         """Prepare dispatch command and get token for next step.
@@ -79,6 +62,31 @@ class DispatchAPI():
         token = self.prepare_command(action, **kwargs)
         kwargs['token'] = token
         self.send_command(action, mode='execute', **kwargs)
+
+
+class DispatchAPI(GeneralAPIAdapter):
+    def __init__(self, ns_api):
+        super(DispatchAPI, self).__init__(ns_api)
+
+    def send_command(self, action, mode, **kwargs):
+        """Send dispatch command.
+
+        Args:
+            action (str): Action to perform on dispatch
+            mode (str): Command mode
+
+        Returns:
+            dict: Respond content
+        """
+
+        resp = self.owner_nation.command('dispatch',
+                                         dispatch=action, mode=mode,
+                                         dispatchid=kwargs.get('dispatch_id', None),
+                                         title=kwargs.get('title', None),
+                                         text=kwargs.get('text', None),
+                                         category=kwargs.get('category', None),
+                                         subcategory=kwargs.get('subcategory', None))
+        return resp
 
     def create_dispatch(self, title, text, category, subcategory):
         """Create a dispatch.

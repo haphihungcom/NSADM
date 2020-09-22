@@ -10,11 +10,11 @@ DISPATCH_LOADER_CONFIG = {'dispatchloader-test1': {'key1': 'val1'}}
 
 
 class TestDispatchLoader():
-    def test_get_dispatch_params(self):
+    def test_get_dispatch_info(self):
         obj = loader.DispatchLoader(DISPATCH_LOADER_NAME,
                                     DISPATCH_LOADER_CONFIG)
         obj.load_loader()
-        r = obj.get_dispatch_params()
+        r = obj.get_dispatch_info()
 
         assert r == {'foo1': 'bar1', 'foo2': 'bar2'}
 
@@ -32,8 +32,7 @@ class TestDispatchLoader():
         obj.load_loader()
         r = obj.add_dispatch_id('test', '123456')
 
-        assert r == None
-
+        assert r
 
 VAR_LOADER_NAMES = ['varloader-test1', 'varloader-test2']
 VAR_LOADER_CONFIG = {'varloader-test1': {'key1': 'val1'},
@@ -59,11 +58,18 @@ class TestCredLoader():
         obj.load_loader()
         r = obj.get_all_creds()
 
-        assert r == {'nation1': 'password1'}
+        assert r == {'nation1': '123456'}
 
-    def test_update_cred(self):
+    def test_add_cred(self):
         obj = loader.CredLoader(CRED_LOADER_NAME, CRED_LOADER_CONFIG)
         obj.load_loader()
-        r = obj.update_cred('nation1', 'password1')
+        r = obj.add_cred('nation1', '123456')
 
-        assert r == None
+        assert r
+
+    def test_delete_cred(self):
+        obj = loader.CredLoader(CRED_LOADER_NAME, CRED_LOADER_CONFIG)
+        obj.load_loader()
+        r = obj.delete_cred('nation1')
+
+        assert r

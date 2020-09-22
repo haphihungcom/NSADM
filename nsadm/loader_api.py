@@ -28,7 +28,7 @@ def init_loader(config):
 
 
 @dispatch_loader_specs(firstresult=True)
-def get_dispatch_params(loader):
+def get_dispatch_info(loader):
     """Get a dict of dispatch parameters.
 
     Args:
@@ -96,8 +96,8 @@ def get_all_creds(config):
 
 
 @cred_loader_specs(firstresult=True)
-def update_cred(config, name, autologin):
-    """Update a nation's credential.
+def add_cred(config, name, autologin):
+    """Add a nation's credential.
 
     Args:
         config (dict): Loaders' configuration
@@ -107,3 +107,14 @@ def update_cred(config, name, autologin):
 
     pass
 
+
+@cred_loader_specs(firstresult=True)
+def delete_cred(config, name):
+    """Delete a nation's credential.
+
+    Args:
+        config (dict): Loaders' configuration
+        name (str): Nation name
+    """
+
+    pass

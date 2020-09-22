@@ -1,3 +1,6 @@
+"""Loads and runs plugins
+"""
+
 import collections
 import os
 
@@ -67,14 +70,14 @@ class DispatchLoader(Loader):
         super(DispatchLoader, self).load_loader()
         self._loader = self.manager.hook.init_loader(config=self.loader_config)
 
-    def get_dispatch_params(self):
-        return self.manager.hook.get_dispatch_params(loader=self._loader)
+    def get_dispatch_info(self):
+        return self.manager.hook.get_dispatch_info(loader=self._loader)
 
     def get_dispatch_text(self, name):
         return self.manager.hook.get_dispatch_text(loader=self._loader, name=name)
 
     def add_dispatch_id(self, name, id):
-        self.manager.hook.add_dispatch_id(loader=self._loader, name=name, id=id)
+        return self.manager.hook.add_dispatch_id(loader=self._loader, name=name, id=id)
 
 
 class VarLoader(Loader):
@@ -108,6 +111,9 @@ class CredLoader(Loader):
     def get_all_creds(self):
         return self.manager.hook.get_all_creds(config=self.loader_config)
 
-    def update_cred(self, name, autologin):
-        return self.manager.hook.update_cred(config=self.loader_config,
+    def add_cred(self, name, autologin):
+        return self.manager.hook.add_cred(config=self.loader_config,
                                              name=name, autologin=autologin)
+
+    def delete_cred(self, name):
+        return self.manager.hook.delete_cred(config=self.loader_config, name=name)

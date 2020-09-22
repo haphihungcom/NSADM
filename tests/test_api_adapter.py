@@ -37,7 +37,7 @@ class TestDispatchAPI():
         dispatch_api = api_adapter.DispatchAPI(mock.Mock())
         dispatch_api.owner_nation = mock_nation
 
-        token = dispatch_api.prepare_command('remove', dispatch_id='1234')
+        token = dispatch_api.prepare_command('remove', dispatch_id='12345')
 
         assert token == '1234abcd'
 
@@ -47,7 +47,7 @@ class TestDispatchAPI():
         dispatch_api.owner_nation = mock_nation
 
         with pytest.raises(exceptions.DispatchAPIError):
-            dispatch_api.prepare_command('remove', dispatch_id='1234')
+            dispatch_api.prepare_command('remove', dispatch_id='12345')
 
     def test_execute_command(self):
         mock_nation = mock.Mock(command=mock.Mock(side_effect=mock_ns_response))

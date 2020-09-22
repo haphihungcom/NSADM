@@ -1,13 +1,16 @@
+"""Adapter for the pynationstates NS API wrapper
+"""
+
 import nationstates
 
 from nsadm import exceptions
 
 
 class GeneralAPIAdapter():
-    """NationSates API adapter. All results returned as set.
+    """API adapter for pynationstates. All results returned as set.
 
     Args:
-        ns_api (nationstates.Nationstates): NationStates API object
+        ns_api (nationstates.Nationstates): pynationstates API object
     """
 
     def __init__(self, ns_api):
@@ -25,12 +28,12 @@ class GeneralAPIAdapter():
         self.owner_nation = self.api.nation(owner_nation, password)
 
         try:
-            self.owner_nation.get_shards('ping', full_response=True)
+            self.owner_nation.get_shards('ping')
         except nationstates.exceptions.Forbidden:
             raise exceptions.DispatchAPIError('Could not log into your nation!')
 
     def send_command(self, action, mode, **kwargs):
-        raise NotImplemented
+        raise NotImplementedError
 
     def prepare_command(self, action, **kwargs):
         """Prepare dispatch command and get token for next step.
@@ -57,11 +60,14 @@ class GeneralAPIAdapter():
 
         Args:
             action (str): Action to perform on dispatch
+
+        Returns:
+            dict: Respond's content
         """
 
         token = self.prepare_command(action, **kwargs)
         kwargs['token'] = token
-        self.send_command(action, mode='execute', **kwargs)
+        return self.send_command(action, mode='execute', **kwargs)
 
 
 class DispatchAPI(GeneralAPIAdapter):
@@ -76,7 +82,7 @@ class DispatchAPI(GeneralAPIAdapter):
             mode (str): Command mode
 
         Returns:
-            dict: Respond content
+            dict: Respond's content
         """
 
         resp = self.owner_nation.command('dispatch',
@@ -94,14 +100,18 @@ class DispatchAPI(GeneralAPIAdapter):
         Args:
             title (str): Dispatch title
             text (str): Dispatch text
-            category (str): Dispatch category (accept descriptive text or number)
-            subcategory (str): DIspatch subcategory (accept descriptive text or number)
+            category (str): Dispatch category number
+            subcategory (str): Dispatch subcategory number
+        Returns:
+            str: New dispatch ID
         """
 
-        self.execute_command('create', title=title,
-                             text=text,
-                             category=category,
-                             subcategory=subcategory)
+        r = self.execute_command('create', title=title,
+                                 text=text,
+                                 category=category,
+                                 subcategory=subcategory)
+
+        return r['success']
 
     def edit_dispatch(self, dispatch_id, title, text, category, subcategory):
         """Edit a dispatch.
@@ -111,7 +121,7 @@ class DispatchAPI(GeneralAPIAdapter):
             title (str): Dispatch title
             text (str): Dispatch text
             category (str): Dispatch category number
-            subcategory (str): DIspatch subcategory number
+            subcategory (str): Dispatch subcategory number
         """
 
         self.execute_command('edit', dispatch_id=dispatch_id,
@@ -124,7 +134,7 @@ class DispatchAPI(GeneralAPIAdapter):
         """Delete a dispatch.
 
         Args:
-            dispatch_id ([type]): [description]
+            dispatch_id (str): Dispatch ID
         """
 
         self.execute_command('remove', dispatchid=dispatch_id)

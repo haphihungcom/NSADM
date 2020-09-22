@@ -19,8 +19,8 @@ class DispatchAPIError(NSADMError):
     pass
 
 
-class DispatchUploadingError(NSADMError):
-    """Dispatch upload error.
+class DispatchUpdatingError(NSADMError):
+    """Dispatch update error.
     """
 
     pass

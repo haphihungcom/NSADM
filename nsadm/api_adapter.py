@@ -17,18 +17,18 @@ class GeneralAPIAdapter():
         self.api = ns_api
         self.owner_nation = None
 
-    def login(self, owner_nation, password):
+    def login(self, nation, password):
         """Send ping to the nation and return X-Pin.
 
         Args:
-            owner_nation (str): Owner nation's name
-            password (str): Owner nation's password
+            nation (str): Nation name
+            password (str): Nation password
         """
 
-        self.owner_nation = self.api.nation(owner_nation, password)
+        self.nation = self.api.nation(nation, password)
 
         try:
-            self.owner_nation.get_shards('ping')
+            return self.nation.get_shards('ping', full_response=True)
         except nationstates.exceptions.Forbidden:
             raise exceptions.DispatchAPIError('Could not log into your nation!')
 

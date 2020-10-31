@@ -56,7 +56,7 @@ class TestCredLoader():
     def test_get_all_creds(self):
         obj = loader.CredLoader(CRED_LOADER_NAME, CRED_LOADER_CONFIG)
         obj.load_loader()
-        r = obj.get_all_creds()
+        r = obj.get_creds()
 
         assert r == {'nation1': '123456'}
 

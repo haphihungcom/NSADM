@@ -68,7 +68,7 @@ def add_dispatch_id(loader, name, id):
 
 
 @var_loader_specs
-def get_all_vars(config):
+def get_vars(config):
     """Get all variables as a dict.
 
     Args:
@@ -82,7 +82,7 @@ def get_all_vars(config):
 
 
 @cred_loader_specs(firstresult=True)
-def get_all_creds(config):
+def get_creds(config):
     """Get all nations' credential.
 
     Args:

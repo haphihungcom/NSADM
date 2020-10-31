@@ -6,5 +6,5 @@ from nsadm import loader_api
 
 
 @loader_api.var_loader
-def get_all_vars(config):
+def get_vars(config):
     return {'key2': config['varloader-test2']}

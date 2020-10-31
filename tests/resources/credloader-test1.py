@@ -6,7 +6,7 @@ from nsadm import loader_api
 
 
 @loader_api.cred_loader
-def get_all_creds(config):
+def get_creds(config):
     return {'nation1': '123456'}
 
 

@@ -92,7 +92,7 @@ class VarLoader(Loader):
                                         names, loader_config)
 
     def get_all_vars(self):
-        vars_list = self.manager.hook.get_all_vars(config=self.loader_config)
+        vars_list = self.manager.hook.get_vars(config=self.loader_config)
         merged_vars_dict = dict(collections.ChainMap(*vars_list))
         return merged_vars_dict
 
@@ -108,8 +108,8 @@ class CredLoader(Loader):
         super(CredLoader, self).__init__(info.CRED_LOADER_PROJ,
                                          name, loader_config)
 
-    def get_all_creds(self):
-        return self.manager.hook.get_all_creds(config=self.loader_config)
+    def get_creds(self):
+        return self.manager.hook.get_creds(config=self.loader_config)
 
     def add_cred(self, name, autologin):
         return self.manager.hook.add_cred(config=self.loader_config,

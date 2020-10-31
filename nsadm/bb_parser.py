@@ -138,8 +138,8 @@ class BBComplexFormatters(BBFormatters):
             self.formatters.append(formatter)
 
 
-class BBParserCore():
-    """Adapter for third-party BBCode parter.
+class BBParserAdapter():
+    """Adapter for third-party BBCode parser.
 
        Args:
             bb_config (dict): BBCode formatter configuration.
@@ -257,16 +257,22 @@ class BBParserLoader():
 
 class BBParser():
     def __init__(self, simple_formatter_path, complex_formatter_path, complex_formatter_config_path):
-        simple_formatters = BBSimpleFormatters()
-        simple_formatters.load_formatters(simple_formatter_path)
+        self.simple_formatter_path = simple_formatter_path
+        self.complex_formatter_path = complex_formatter_path
+        self.complex_formatter_config_path = complex_formatter_config_path
 
-        registry = BBRegistry()
-        complex_formatters = BBComplexFormatters()
-        complex_formatters.load_formatters(registry, complex_formatter_path,
-                                           complex_formatter_config_path)
+        self.parser = BBParserAdapter()
+        self.simple_formatters = BBSimpleFormatters()
+        self.registry = BBRegistry()
+        self.complex_formatters = BBComplexFormatters()
 
-        loader = BBParserLoader(BBParserCore())
-        self.parser = loader.load_parser(simple_formatters, complex_formatters)
+    def load_formatters(self):
+        self.simple_formatters.load_formatters(self.simple_formatter_path)
+        self.complex_formatters.load_formatters(self.registry, self.complex_formatter_path,
+                                                self.complex_formatter_config_path)
+
+        loader = BBParserLoader(self.parser)
+        self.parser = loader.load_parser(self.simple_formatters, self.complex_formatters)
 
     def format(self, text, **kwargs):
         """Format BBCode text.

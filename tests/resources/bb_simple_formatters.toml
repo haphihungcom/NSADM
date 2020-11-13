@@ -1,8 +1,8 @@
-[tag1]
-template = '[tagr1]%(value)s[/tagr1]'
+[simple1]
+template = '[simple1r]%(value)s[/simple1r]'
 
-[tag2]
-template = '[tagr2]%(value)s[/tagr2]'
+[simple2]
+template = '[simple2r]%(value)s[/simple2r]'
 
-[tag3]
+[simple3]
 render_embedded = false

@@ -1,25 +1,25 @@
 from nsadm import BBCode
 
 
-@BBCode.register('dar')
-class Dar():
+@BBCode.register('complex')
+class Complex():
     def format(self, tag_name, value, options, parent, context):
-        return "[abc]{}[/abc]".format(value)
+        return "[complexr]{}[/complexr]".format(value)
 
 
-@BBCode.register('foo', render_embedded=False)
-class Foo():
+@BBCode.register('complexctx', render_embedded=False)
+class ComplexCtx():
     def format(self, tag_name, value, options, parent, context):
-        return "[efg={}]{}[/efg]".format(context['example']['hoo'], value)
+        return "[complexctxr={}]{}[/complexctxr]".format(context['example']['foo'], value)
 
 
-@BBCode.register('bar')
-class Bar():
+@BBCode.register('complexcfg')
+class ComplexCfg():
     def format(self, tag_name, value, options, parent, context):
-        return "[xyz={}]{}[/xyz]".format(self.config['testkey'], value)
+        return "[complexcfgr={}]{}[/complexcfgr]".format(self.config['testcfgkey'], value)
 
 
-@BBCode.register('moo')
-class Moo():
+@BBCode.register('complexopt')
+class ComplexOpt():
     def format(self, tag_name, value, options, parent, context):
-        return "[vnm={}]{}[/vnm]".format(options['moo'], value)
+        return "[complexoptr={}]{}[/complexoptr]".format(options['opt'], value)

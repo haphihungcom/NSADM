@@ -10,7 +10,7 @@ from nsadm import bb_parser
 
 class TestBBParserCore():
     def test_add_simple_formatter(self):
-        ins = bb_parser.BBParserCore()
+        ins = bb_parser.BBParserAdapter()
         add_simple_formatter = mock.Mock()
         ins.parser.add_simple_formatter = add_simple_formatter
 
@@ -20,7 +20,7 @@ class TestBBParserCore():
                                                 escape_html=True)
 
     def test_add_complex_formatter(self):
-        ins = bb_parser.BBParserCore()
+        ins = bb_parser.BBParserAdapter()
         mock_func = mock.Mock()
         add_formatter = mock.Mock()
         ins.parser.add_formatter = add_formatter
@@ -31,7 +31,7 @@ class TestBBParserCore():
                                          escape_html=True)
 
     def test_format(self):
-        ins = bb_parser.BBParserCore()
+        ins = bb_parser.BBParserAdapter()
         mock_format = mock.Mock(return_value='Test')
         ins.parser = mock.Mock(format=mock_format)
 
@@ -275,10 +275,13 @@ class TestBBParserIntegration():
         complex_formatter_config_path = 'tests/resources/bb_complex_formatter_config.toml'
         ins = bb_parser.BBParser(simple_formatter_path, complex_formatter_path,
                                  complex_formatter_config_path)
-        text = ('[dar]john[bar]doe[/bar][/dar][foo]marry[tag1]curie[/tag1][/foo]'
-                '[moo=123][tag2]mirai[/tag2][/moo][tag3]abc[/tag3]')
+        ins.load_formatters()
+        text = ('[simple1]Simple[/simple1][simple2]Simple [simple3]nested[/simple3][/simple2]'
+                '[complex]Complex[/complex][complexctx]Complex context[/complexctx]'
+                '[complexcfg]Complex config [complexopt opt=test]option[/complexopt][/complexcfg]')
 
-        r = ins.format(text, example={'hoo': 'cool'})
+        r = ins.format(text, example={'foo': 'bar'})
 
-        assert r == ('[abc]john[xyz=testval]doe[/xyz][/abc][efg=cool]marry[tag1]curie[/tag1][/efg]'
-                     '[vnm=123][tagr2]mirai[/tagr2][/vnm][tag3]abc[/tag3]')
+        assert r == ('[simple1r]Simple[/simple1r][simple2r]Simple [simple3]nested[/simple3][/simple2r]'
+                     '[complexr]Complex[/complexr][complexctxr=bar]Complex context[/complexctxr]'
+                     '[complexcfgr=testcfgval]Complex config [complexoptr=test]option[/complexoptr][/complexcfgr]')

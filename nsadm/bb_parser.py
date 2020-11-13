@@ -257,6 +257,14 @@ class BBParserLoader():
 
 class BBParser():
     def __init__(self, simple_formatter_path, complex_formatter_path, complex_formatter_config_path):
+        """Render NSCode tags from custom BBCode tags.
+
+        Args:
+            simple_formatter_path (str): Simple formatter file path
+            complex_formatter_path (str): Complex formatter file path
+            complex_formatter_config_path (str): Complex formatter config file path
+        """
+
         self.simple_formatter_path = simple_formatter_path
         self.complex_formatter_path = complex_formatter_path
         self.complex_formatter_config_path = complex_formatter_config_path
@@ -267,6 +275,9 @@ class BBParser():
         self.complex_formatters = BBComplexFormatters()
 
     def load_formatters(self):
+        """Load all formatters from their files.
+        """
+
         self.simple_formatters.load_formatters(self.simple_formatter_path)
         self.complex_formatters.load_formatters(self.registry, self.complex_formatter_path,
                                                 self.complex_formatter_config_path)

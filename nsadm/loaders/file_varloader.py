@@ -11,23 +11,30 @@ logger = logging.getLogger(__name__)
 def load_vars_from_file(path):
     try:
         vars = toml.load(path)
-        logger.debug('Loaded custom vars file "%s"', path)
+        logger.debug('Loaded vars file "%s"', path)
         return vars
     except FileNotFoundError:
-        raise FileNotFoundError('Custom vars file {} not found'.format(path))
+        raise FileNotFoundError('Vars file {} not found'.format(path))
+
+
+def get_all_vars(paths):
+    vars = {}
+
+    if isinstance(paths, list):
+        if not paths:
+            logger.debug('No vars file found')
+        else:
+            for path in paths:
+                vars.update(load_vars_from_file(path))
+    elif paths == '':
+        logger.debug('No vars file found')
+    else:
+        vars = load_vars_from_file(paths)
+
+    return vars
 
 
 @loader_api.var_loader
 def get_vars(config):
     var_paths = config['file_varloader']['var_paths']
-    vars = {}
-
-    if isinstance(var_paths, list):
-        for path in var_paths:
-            load_vars_from_file(path)
-    elif var_paths == '':
-        logger.debug('No custom vars file found')
-    else:
-        load_vars_from_file(var_paths)
-
-    return vars
+    return get_all_vars(var_paths)

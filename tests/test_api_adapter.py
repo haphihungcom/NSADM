@@ -7,10 +7,10 @@ from nsadm import api_adapter
 from nsadm import exceptions
 
 
-def mock_ns_response(command, **kwargs):
+def mock_ns_response(*args, **kwargs):
     if kwargs['mode'] == 'prepare':
         return {'success': '1234abcd'}
-    elif kwargs['mode'] == 'execute':
+    elif kwargs['mode'] == 'execute' and kwargs['token'] == '1234abcd':
         return {'success': 'Done'}
 
 
@@ -57,6 +57,6 @@ class TestDispatchAPI():
         dispatch_api.execute_command('create', title='test', text='hello world',
                                      category='1', subcategory='100')
 
-        mock_nation.command.called_with('create', title='test', text='hello world',
-                                        category='1', subcategory='100',
-                                        token='1234abcd')
+        mock_nation.command.assert_called_with('dispatch', dispatch='create', mode='execute', dispatchid=None,
+                                               title='test', text='hello world', category='1', subcategory='100',
+                                               token='1234abcd')

@@ -18,17 +18,17 @@ class GeneralAPIAdapter():
         self.owner_nation = None
 
     def login(self, nation, password):
-        """Send ping to the nation and return X-Pin.
+        """Get nation and test login.
 
         Args:
             nation (str): Nation name
             password (str): Nation password
         """
 
-        self.nation = self.api.nation(nation, password)
+        self.owner_nation = self.api.nation(nation, password)
 
         try:
-            return self.nation.get_shards('ping', full_response=True)
+            self.owner_nation.get_shards('ping', full_response=True)
         except nationstates.exceptions.Forbidden:
             raise exceptions.DispatchAPIError('Could not log into your nation!')
 
@@ -91,7 +91,8 @@ class DispatchAPI(GeneralAPIAdapter):
                                          title=kwargs.get('title', None),
                                          text=kwargs.get('text', None),
                                          category=kwargs.get('category', None),
-                                         subcategory=kwargs.get('subcategory', None))
+                                         subcategory=kwargs.get('subcategory', None),
+                                         token=kwargs.get('token', None))
         return resp
 
     def create_dispatch(self, title, text, category, subcategory):

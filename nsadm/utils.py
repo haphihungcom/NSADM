@@ -11,88 +11,8 @@ import importlib
 import toml
 import bs4
 
+
 logger = logging.getLogger(__name__)
-
-
-class IDStore(collections.UserDict):
-    """Load dispatch ID list. Create a new one if not exist.
-
-    Args:
-        id_store_path (str): Path to dispatch ID list.
-    """
-
-    def __init__(self, id_store_path):
-        if id_store_path is None:
-            logger.error('ID store path not configured!')
-        self.id_store_path = id_store_path
-        self.saved = False
-        super().__init__()
-
-    def load_from_json(self):
-        """Load dispatch IDs from configured JSON file.
-        """
-        if self.id_store_path is None:
-            return
-
-        try:
-            with open(self.id_store_path) as f:
-                self.data = json.load(f)
-                logger.debug('Loaded id store: %r', self.data)
-        except FileNotFoundError:
-            self.save()
-            logger.debug('Created id store at "%s"', self.id_store_path)
-
-    def load_from_dispatch_config(self, dispatches):
-        """Load dispatch IDs from dispatch configurations.
-
-        Args:
-            dispatches (dict): Dispatch configuration.
-        """
-
-        for name, info in dispatches.items():
-            try:
-                self.data[name] = info['id']
-            except KeyError:
-                pass
-
-        self.saved = False
-
-    def __setitem__(self, name, dispatch_id):
-        """Add new dispatch ID.
-
-        Args:
-            name (str): Dispatch file name.
-            dispatch_id (int): Dispatch ID.
-        """
-
-        self.data[name] = dispatch_id
-        self.saved = False
-
-    def add_id_from_html(self, name, html):
-        """Add new dispatch ID from dispatch's HTML text respond.
-
-        Args:
-            html (str): HTML from response.
-            name (str): Dispatch file name.
-        """
-
-        dispatch_id = get_id_from_html(html)
-        self[name] = dispatch_id
-        logger.debug('Added ID "%d" of dispatch "%s"',
-                     dispatch_id, name)
-
-    def save(self):
-        """Save ID store into file.
-        """
-
-        if self.saved or self.id_store_path is None:
-            return
-
-        with open(self.id_store_path, 'w') as f:
-            json.dump(self.data, f)
-            self.saved = True
-            logger.debug('Saved id store: %r', self.data)
-
 
 
 def get_dispatch_info(dispatch_config, id_store):
@@ -108,7 +28,7 @@ def get_dispatch_info(dispatch_config, id_store):
     """
 
     dispatches = dispatch_config
-    for name, dispatch_id in id_store.items():
+    for name in id_store.keys():
         if name in dispatches:
             dispatches[name]['id'] = id_store[name]
         else:

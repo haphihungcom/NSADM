@@ -77,28 +77,6 @@ class IDStore(collections.UserDict):
             logger.debug('Saved id store: %r', self.data)
 
 
-def get_dispatch_info(dispatch_config, id_store):
-    """Compose and return dispatch information
-    for use as context in the template renderer.
-
-    Args:
-        dispatch_config (dict): Dispatch configuration.
-        id_store (IDStore): Dispatch ID store.
-
-    Returns:
-        dict: Dispatch information.
-    """
-
-    dispatches = dispatch_config
-    for name in id_store.keys():
-        if name in dispatches:
-            dispatches[name]['id'] = id_store[name]
-        else:
-            dispatches[name] = {'id': id_store[name]}
-
-    return dispatches
-
-
 def load_dispatch_config(dispatch_config_path):
         """Load dispatch configuration files.
 

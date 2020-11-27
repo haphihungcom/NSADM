@@ -10,11 +10,11 @@ DISPATCH_LOADER_CONFIG = {'dispatchloader-test1': {'key1': 'val1'}}
 
 
 class TestDispatchLoader():
-    def test_get_dispatch_info(self):
+    def test_get_dispatch_config(self):
         obj = loader.DispatchLoader(DISPATCH_LOADER_NAME,
                                     DISPATCH_LOADER_CONFIG)
         obj.load_loader()
-        r = obj.get_dispatch_info()
+        r = obj.get_dispatch_config()
 
         assert r == {'foo1': 'bar1', 'foo2': 'bar2'}
 

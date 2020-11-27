@@ -61,19 +61,19 @@ class DispatchUpdater():
         self.dispatch_api = dispatch_api
         self.renderer = renderer
         self.dispatch_loader = dispatch_loader
-        self.dispatch_info = None
+        self.dispatch_config = None
         self.creds = creds
 
-    def login_owner_nation(self, owner_nation, dispatch_info):
+    def login_owner_nation(self, owner_nation, dispatch_config):
         """Log into dispatch owner nation and set its dispatches' info.
 
         Args:
             owner_nation (str): Nation name
-            dispatch_info (dict): Nation's dispatches' info
+            dispatch_config (dict): Nation's dispatches' info
         """
 
         self.dispatch_api.login(owner_nation, self.creds[owner_nation])
-        self.dispatch_info = dispatch_info
+        self.dispatch_config = dispatch_config
 
     def update_dispatch(self, name):
         """Update a dispatch.
@@ -82,14 +82,14 @@ class DispatchUpdater():
             name (str): Dispatch name
         """
 
-        this_dispatch_info = self.dispatch_info[name]
-        action = this_dispatch_info.pop('action')
+        this_dispatch_config = self.dispatch_config[name]
+        action = this_dispatch_config.pop('action')
 
         if action == 'remove':
-            dispatch_id = this_dispatch_info['ns_id']
+            dispatch_id = this_dispatch_config['ns_id']
             self.delete_dispatch(dispatch_id)
         else:
-            self.create_or_edit_dispatch(name, action, this_dispatch_info)
+            self.create_or_edit_dispatch(name, action, this_dispatch_config)
 
     def get_dispatch_text(self, name):
         """Get rendered text for a dispatch.
@@ -101,25 +101,24 @@ class DispatchUpdater():
             str: Rendered text
         """
 
-        text = self.dispatch_loader.get_dispatch_text(name)
-        return self.renderer.render(text)
+        return self.renderer.render(name)
 
-    def create_or_edit_dispatch(self, name, action, this_dispatch_info):
+    def create_or_edit_dispatch(self, name, action, this_dispatch_config):
         """Create or edit a dispatch based on action.
 
         Args:
             name (str): Dispatch name
             action (str): Action to perform
-            this_dispatch_info (dict): This dispatch's info
+            this_dispatch_config (dict): This dispatch's info
 
         Raises:
             exceptions.DispatchUpdatingError: Raises when action is invalid
         """
 
-        category = this_dispatch_info['category']
-        subcategory = this_dispatch_info['subcategory']
+        category = this_dispatch_config['category']
+        subcategory = this_dispatch_config['subcategory']
         category_num, subcategory_num = get_category_number(category, subcategory)
-        title = this_dispatch_info['title']
+        title = this_dispatch_config['title']
         text = self.get_dispatch_text(name)
 
         params = {'title': title,
@@ -130,7 +129,7 @@ class DispatchUpdater():
         if action == 'create':
             self.create_dispatch(name, params)
         elif action == 'edit':
-            dispatch_id = this_dispatch_info['ns_id']
+            dispatch_id = this_dispatch_config['ns_id']
             self.edit_dispatch(dispatch_id, params)
         else:
             raise exceptions.DispatchUpdatingError

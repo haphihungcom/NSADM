@@ -28,16 +28,16 @@ class TestDispatchUpdater():
         creds = {'test_nation': '12345'}
         mock_obj = mock.Mock()
         ins = updater.DispatchUpdater(dispatch_api, creds, mock_obj, mock_obj)
-        dispatch_info = {'test_name': {'title': 'test_title',
-                                       'category': '1',
-                                       'subcategory': '100',
-                                       'ns_id': '12345',
-                                       'action': 'remove'}}
+        dispatch_config = {'test_name': {'title': 'test_title',
+                                         'category': '1',
+                                         'subcategory': '100',
+                                         'ns_id': '12345',
+                                         'action': 'remove'}}
 
-        ins.login_owner_nation('test_nation', dispatch_info)
+        ins.login_owner_nation('test_nation', dispatch_config)
 
         login.assert_called_with('test_nation', '12345')
-        assert ins.dispatch_info == dispatch_info
+        assert ins.dispatch_config == dispatch_config
 
     def test_create_dispatch(self):
         create_dispatch = mock.Mock(return_value='12345')
@@ -59,12 +59,12 @@ class TestDispatchUpdater():
         ins = updater.DispatchUpdater(mock_obj, mock_obj, mock_obj, mock_obj)
         ins.create_dispatch = mock.Mock()
         ins.get_dispatch_text = mock.Mock(return_value='test_text')
-        this_dispatch_info = {'title': 'test_title',
-                              'category': '1',
-                              'subcategory': '100',
-                              'ns_id': '12345'}
+        this_dispatch_config = {'title': 'test_title',
+                                'category': '1',
+                                'subcategory': '100',
+                                'ns_id': '12345'}
 
-        ins.create_or_edit_dispatch('test_name', 'create', this_dispatch_info)
+        ins.create_or_edit_dispatch('test_name', 'create', this_dispatch_config)
 
         ins.create_dispatch.assert_called_with('test_name',
                                                {'title': 'test_title',
@@ -77,12 +77,12 @@ class TestDispatchUpdater():
         ins = updater.DispatchUpdater(mock_obj, mock_obj, mock_obj, mock_obj)
         ins.edit_dispatch = mock.Mock()
         ins.get_dispatch_text = mock.Mock(return_value='test_text')
-        this_dispatch_info = {'title': 'test_title',
-                              'category': '1',
-                              'subcategory': '100',
-                              'ns_id': '12345'}
+        this_dispatch_config = {'title': 'test_title',
+                                'category': '1',
+                                'subcategory': '100',
+                                'ns_id': '12345'}
 
-        ins.create_or_edit_dispatch('test_name', 'edit', this_dispatch_info)
+        ins.create_or_edit_dispatch('test_name', 'edit', this_dispatch_config)
 
         ins.edit_dispatch.assert_called_with('12345',
                                              {'title': 'test_title',
@@ -93,11 +93,11 @@ class TestDispatchUpdater():
     def test_update_dispatch_with_remove_action(self):
         mock_obj = mock.Mock()
         ins = updater.DispatchUpdater(mock_obj, mock_obj, mock_obj, mock_obj)
-        ins.dispatch_info = {'test_name': {'title': 'test_title',
-                                           'category': '1',
-                                           'subcategory': '100',
-                                           'ns_id': '12345',
-                                           'action': 'remove'}}
+        ins.dispatch_config = {'test_name': {'title': 'test_title',
+                                             'category': '1',
+                                             'subcategory': '100',
+                                             'ns_id': '12345',
+                                             'action': 'remove'}}
         ins.delete_dispatch = mock.Mock()
 
         ins.update_dispatch('test_name')
@@ -107,11 +107,11 @@ class TestDispatchUpdater():
     def test_update_dispatch_with_no_remove_action(self):
         mock_obj = mock.Mock()
         ins = updater.DispatchUpdater(mock_obj, mock_obj, mock_obj, mock_obj)
-        ins.dispatch_info = {'test_name': {'title': 'test_title',
-                                           'category': '1',
-                                           'subcategory': '100',
-                                           'ns_id': '12345',
-                                           'action': 'create'}}
+        ins.dispatch_config = {'test_name': {'title': 'test_title',
+                                             'category': '1',
+                                             'subcategory': '100',
+                                             'ns_id': '12345',
+                                             'action': 'create'}}
         ins.create_or_edit_dispatch = mock.Mock()
 
         ins.update_dispatch('test_name')

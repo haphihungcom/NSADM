@@ -69,7 +69,7 @@ class TemplateRenderer():
         return self.env.get_template(name).render(context)
 
 
-class Renderer():
+class DispatchRenderer():
     """Render dispatches from templates and process custom BBCode tags.
 
     Args:
@@ -77,10 +77,10 @@ class Renderer():
         var_loader: Var loader
         bb_config (dict): BBCode parser configuration
         template_config (dict): Template renderer configuration
-        dispatch_info (dict): Info of all dispatches
+        dispatch_config (dict): Dispatch configuration
     """
 
-    def __init__(self, dispatch_loader, var_loader, bb_config, template_config, dispatch_info):
+    def __init__(self, dispatch_loader, var_loader, bb_config, template_config, dispatch_config):
         self.template_renderer = TemplateRenderer(dispatch_loader,
                                                   template_config.get('filters_path', None))
 
@@ -88,7 +88,7 @@ class Renderer():
                                             bb_config.get('complex_formatter_path', None),
                                             bb_config.get('complex_formatter_config_path', None))
 
-        self.dispatch_info = dispatch_info
+        self.dispatch_config = dispatch_config
         self.var_loader = var_loader
 
         # Context all dispatches will have
@@ -102,7 +102,7 @@ class Renderer():
         self.bb_parser.load_formatters()
 
         self.global_context = self.var_loader.get_all_vars()
-        self.global_context['dispatch_info'] = self.dispatch_info
+        self.global_context['dispatch_info'] = utils.get_dispatch_info(self.dispatch_config)
 
     def render(self, name):
         """Render a dispatch.
@@ -115,8 +115,7 @@ class Renderer():
         """
 
         context = self.global_context
-        context['current_dispatch'] = self.dispatch_info[name]
-        context['current_dispatch']['name'] = name
+        context['current_dispatch'] = name
 
         rendered = self.template_renderer.render(name, context)
         rendered = self.bb_parser.format(rendered, **context)

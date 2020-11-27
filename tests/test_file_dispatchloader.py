@@ -86,34 +86,3 @@ class TestLoadDispatchConfig():
         r = file_dispatchloader.load_dispatch_config(['test1.toml', 'test2.toml'])
 
         assert r == {'Test1': 'TestVal1', 'Test2': 'TestVal2'}
-
-
-class TestGetDispatchInfo():
-    def test_with_no_missing_dispatch(self):
-        dispatch_config = {'test1': {'title': 'Test 1', 'category': '123',
-                                     'subcategory-123': '456'},
-                           'test2': {'title': 'Test 2', 'category': '678',
-                                     'subcategory-123': '980'}}
-        id_store = {'test1': 1234567, 'test2': 8901234}
-
-        r = file_dispatchloader.get_dispatch_info(dispatch_config, id_store)
-        assert r == {'test1': {'id': 1234567, 'title': 'Test 1',
-                               'category': '123', 'subcategory-123': '456'},
-                     'test2': {'id': 8901234, 'title': 'Test 2',
-                               'category': '678', 'subcategory-123': '980'}}
-
-    def test_with_missing_dispatches(self):
-        dispatch_config = {'test1': {'title': 'Test 1', 'category': '123',
-                                     'subcategory-123': '456'},
-                           'test2': {'title': 'Test 2', 'category': '678',
-                                     'subcategory-123': '980'}}
-        id_store = {'test1': 1234567, 'test2': 8901234,
-                    'test3': 9876543, 'test4': 456789}
-
-        r = file_dispatchloader.get_dispatch_info(dispatch_config, id_store)
-
-        assert r == {'test1': {'id': 1234567, 'title': 'Test 1',
-                               'category': '123', 'subcategory-123': '456'},
-                     'test2': {'id': 8901234, 'title': 'Test 2',
-                               'category': '678', 'subcategory-123': '980'},
-                     'test3': {'id': 9876543}, 'test4': {'id': 456789}}

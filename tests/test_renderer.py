@@ -47,20 +47,20 @@ class TestTemplateRenderer():
 class TestDispatchRenderer():
     def test_render(self, get_mock_dispatch_loader):
         template_text = ('{% for i in j %}[simple1]{{ i|filter2(1) }}[/simple1]{% endfor %}'
-                         '[complex]{{ john.dave }}{{ current_dispatch.name }}[/complex][complexcfg]'
+                         '[complex]{{ john.dave }}{{ current_dispatch }}[/complex][complexcfg]'
                          '{{ key1 }}[/complexcfg]')
         dispatch_loader = get_mock_dispatch_loader(template_text)
         vars = {'j': [1, 2, 3],
                 'john': {'dave': 'marry'},
                 'key1': 'val1'}
         var_loader = mock.Mock(get_all_vars=mock.Mock(return_value=vars))
-        dispatch_info = {'test1': {'id': 1234567, 'title': 'ABC'},
-                         'test2': {'id': 7890123, 'title': 'DEF'}}
+        dispatch_config = {'nation1': {'test1': {'ns_id': 1234567, 'title': 'ABC'},
+                                       'test2': {'ns_id': 7890123, 'title': 'DEF'}}}
         template_config = {'filters_path': 'tests/resources/filters.py'}
         bb_config = {'simple_formatter_path': 'tests/resources/bb_simple_formatters.toml',
                      'complex_formatter_path': 'tests/resources/bb_complex_formatters.py',
                       'complex_formatter_config_path': 'tests/resources/bb_complex_formatter_config.toml'}
-        ins = renderer.Renderer(dispatch_loader, var_loader, bb_config, template_config, dispatch_info)
+        ins = renderer.DispatchRenderer(dispatch_loader, var_loader, bb_config, template_config, dispatch_config)
         ins.load()
 
         expected = ('[simple1r]1and1[/simple1r][simple1r]2and1[/simple1r][simple1r]3and1[/simple1r]'

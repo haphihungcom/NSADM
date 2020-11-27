@@ -11,9 +11,9 @@ def get_creds(config):
 
 
 @loader_api.cred_loader
-def add_cred(config, name, autologin):
+def add_cred(config, name, x_autologin):
     return True
 
 @loader_api.cred_loader
-def delete_cred(config, name):
+def remove_cred(config, name):
     return True

@@ -10,16 +10,16 @@ def get_creds(config):
 
 
 @loader_api.cred_loader
-def add_cred(config, name, autologin):
+def add_cred(config, name, x_autologin):
     with open(config['json_credloader']['cred_path'], 'r+') as f:
         creds = json.load(f)
         f.seek(0)
-        creds[name] = autologin
+        creds[name] = x_autologin
         json.dump(creds, f)
 
 
 @loader_api.cred_loader
-def delete_cred(config, name):
+def remove_cred(config, name):
     with open(config['json_credloader']['cred_path'], 'r+') as f:
         creds = json.load(f)
         f.seek(0)

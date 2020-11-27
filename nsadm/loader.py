@@ -112,9 +112,9 @@ class CredLoader(Loader):
     def get_creds(self):
         return self.manager.hook.get_creds(config=self.loader_config)
 
-    def add_cred(self, name, autologin):
+    def add_cred(self, name, x_autologin):
         return self.manager.hook.add_cred(config=self.loader_config,
-                                             name=name, autologin=autologin)
+                                             name=name, x_autologin=x_autologin)
 
-    def delete_cred(self, name):
-        return self.manager.hook.delete_cred(config=self.loader_config, name=name)
+    def remove_cred(self, name):
+        return self.manager.hook.remove_cred(config=self.loader_config, name=name)

@@ -67,9 +67,9 @@ class TestCredLoader():
 
         assert r
 
-    def test_delete_cred(self):
+    def test_remove_cred(self):
         obj = loader.CredLoader(CRED_LOADER_NAME, CRED_LOADER_CONFIG)
         obj.load_loader()
-        r = obj.delete_cred('nation1')
+        r = obj.remove_cred('nation1')
 
         assert r

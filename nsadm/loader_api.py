@@ -96,20 +96,20 @@ def get_creds(config):
 
 
 @cred_loader_specs(firstresult=True)
-def add_cred(config, name, autologin):
+def add_cred(config, name, x_autologin):
     """Add a nation's credential.
 
     Args:
         config (dict): Loaders' configuration
         name (str): Nation name
-        autologin (str): Nation's X-Autologin.
+        x_autologin (str): Nation's X-Autologin.
     """
 
     pass
 
 
 @cred_loader_specs(firstresult=True)
-def delete_cred(config, name):
+def remove_cred(config, name):
     """Delete a nation's credential.
 
     Args:

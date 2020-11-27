@@ -15,14 +15,15 @@ def mock_ns_response(*args, **kwargs):
 
 
 class TestDispatchAPI():
-    def test_login(self):
-        mock_nation =  mock.Mock(get_shards=mock.Mock())
+    def test_login_and_get_autologin(self):
+        response = {'headers': {'X-Autologin': '123456'}}
+        mock_nation =  mock.Mock(get_shards=mock.Mock(return_value=response))
         mock_nsapi = mock.Mock(nation=mock.Mock(return_value=mock_nation))
         dispatch_api = api_adapter.DispatchAPI(mock_nsapi)
 
-        dispatch_api.login('my_nation', 'hunterprime123')
+        autologin = dispatch_api.login('my_nation', 'hunterprime123')
 
-        assert mock_nation.get_shards.called_with('my_nation', 'hunterprime123')
+        assert autologin == '123456'
 
     def test_login_forbidden_exception(self):
         mock_nation =  mock.Mock(get_shards=mock.Mock(side_effect=nationstates.exceptions.Forbidden))

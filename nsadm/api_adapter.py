@@ -7,7 +7,7 @@ from nsadm import exceptions
 
 
 class GeneralAPIAdapter():
-    """API adapter for pynationstates. All results returned as set.
+    """API adapter for pynationstates.
 
     Args:
         ns_api (nationstates.Nationstates): pynationstates API object
@@ -17,18 +17,19 @@ class GeneralAPIAdapter():
         self.api = ns_api
         self.owner_nation = None
 
-    def login(self, nation, password):
+    def login(self, nation_name, password):
         """Get nation and test login.
 
         Args:
-            nation (str): Nation name
+            nation_name (str): Nation name
             password (str): Nation password
         """
 
-        self.owner_nation = self.api.nation(nation, password)
+        self.owner_nation = self.api.nation(nation_name, password)
 
         try:
-            self.owner_nation.get_shards('ping', full_response=True)
+            r = self.owner_nation.get_shards('ping', full_response=True)
+            return r['headers']['X-Autologin']
         except nationstates.exceptions.Forbidden:
             raise exceptions.DispatchAPIError('Could not log into your nation!')
 

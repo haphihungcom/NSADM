@@ -123,6 +123,8 @@ def init_loader(config):
 
     id_store = IDStore(this_config['id_store_path'])
     dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
+    id_store.load_from_dispatch_config(dispatch_config)
+
     loader = FileDispatchLoader(id_store, dispatch_config, this_config['file_ext'])
 
     return loader

@@ -35,7 +35,7 @@ class TestIDStore():
 
         assert ins == {'Test': 1}
 
-    def test_load_id_store_from_dispatches(self):
+    def test_load_id_store_from_dispatch_config(self):
         ins = file_dispatchloader.IDStore('test.json')
         ins['test1'] = 1234567
 
@@ -86,3 +86,23 @@ class TestLoadDispatchConfig():
         r = file_dispatchloader.load_dispatch_config(['test1.toml', 'test2.toml'])
 
         assert r == {'Test1': 'TestVal1', 'Test2': 'TestVal2'}
+
+
+class TestFileDispatchLoader():
+    def test_integration_no_id_store(self, toml_files, text_files):
+        dispatch_config = {'nation1': {'test1': {'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'},
+                                       'test2': {'ns_id': '123456',
+                                                 'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'}}}
+        toml_files({'test.toml': dispatch_config})
+        text_files({'test1.txt': 'Test text'})
+        config = {'file_dispatchloader': {'id_store_path': 'test.json',
+                                          'dispatch_config_paths': 'test.toml',
+                                          'file_ext': 'txt'}}
+        loader = file_dispatchloader.init_loader(config)
+
+        assert loader.id_store['test2'] == '123456'
+        assert file_dispatchloader.get_dispatch_text(loader, 'test1') == 'Test text'

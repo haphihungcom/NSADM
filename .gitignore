@@ -5,4 +5,4 @@ __pycache__/
 templates/
 config/
 virtualenv/
-nsadm/tsp_templates/
+nsadm/templates/

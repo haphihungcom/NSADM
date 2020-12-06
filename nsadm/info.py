@@ -9,6 +9,9 @@ LOADER_DIR_PATH = 'loaders'
 # General configuration path
 CONFIG_PATH = 'config.toml'
 
+# Description of --help
+DESCRIPTION = 'Update and automatically format dispatches'
+
 # Category name and code reference.
 SUBCATEGORIES_1 = {'overview': '100',
                   'history': '101',

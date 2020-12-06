@@ -1,10 +1,15 @@
+import argparse
 import logging
 
 import toml
+import nationstates
 
+from nsadm import api_adapter
 from nsadm import exceptions
+from nsadm import loader
+from nsadm import info
 from nsadm import renderer
-from nsadm import uploader
+from nsadm import updater
 from nsadm import utils
 
 
@@ -12,97 +17,52 @@ logger = logging.getLogger(__name__)
 
 
 class NSADM():
-    def __init__(self, ns_site, config, data):
-        self.config = config
-        general_conf = config.get('general', {})
-        self.ns_site = ns_site
+    def __init__(self, config):
+        ns_api = nationstates.Nationstates(user_agent=config['general']['user_agent'])
+        dispatch_api = api_adapter.DispatchAPI(ns_api)
 
-        self.dispatch_config = utils.load_dispatch_config(general_conf.get('dispatch_config_path', None))
-        if not self.dispatch_config:
-            raise exceptions.NSADMError('No dispatch was configured')
-        self.blacklist = general_conf.get('blacklist', [])
+        plugin_options = config['plugins']
+        loader_config = config['loader_config']
 
-        dry_run_conf = config.get('dry_run', {})
-        self.dry_run_dispatches = dry_run_conf.get('dispatches', None)
+        self.dispatch_loader = loader.DispatchLoader(plugin_options['dispatch_loader'], loader_config)
+        self.var_loader = loader.VarLoader(plugin_options['var_loader'], loader_config)
 
-        self.id_store = utils.IDStore(general_conf.get('id_store_path', None))
+        self.dispatch_config = None
 
-        renderer_conf = config.get('renderer', {})
-        self.renderer = renderer.Renderer(renderer_conf)
+        bb_config = config['bbcode']
+        template_config= config['template_renderer']
+        self.renderer = renderer.DispatchRenderer(self.dispatch_loader, self.var_loader, bb_config,
+                                                  template_config, self.dispatch_config)
 
-        self.uploader = uploader.DispatchUploader(self.renderer, ns_site,
-                                                  self.id_store, self.dispatch_config)
+        self.cred_loader = loader.CredLoader(plugin_options['cred_loader'], loader_config)
+        self.creds = utils.CredManager(self.cred_loader, dispatch_api)
 
-        self.create_all_dispatches()
-        self.id_store.save()
+        self.updater = updater.DispatchUpdater(dispatch_api, self.creds, self.renderer, self.dispatch_loader)
 
-        self.config = config
-        self.data = data
+    def load(self):
+        self.dispatch_loader.load_loader()
+        self.dispatch_config = self.dispatch_loader.get_dispatch_config()
 
-    def update_ctx(self):
-        dispatch_info = utils.get_dispatch_info(self.dispatch_config,
-                                                self.id_store)
-        self.renderer.update_ctx(self.data, self.config,
-                                 self.config, dispatch_info)
+        self.cred_loader.load_loader()
+        self.creds.load_creds()
 
-    def run(self):
-        self.update_ctx()
-        self.update_all_dispatches()
+        self.var_loader.load_loader()
+        self.renderer.load()
 
-    def prepare(self):
-        self.id_store.load_from_json()
-        self.id_store.load_from_dispatch_config(self.dispatch_config)
+    def update_dispatches(self, dispatches=None):
+        pass
 
-    def dry_run(self):
-        self.update_ctx()
+    def add_nation_cred(self, nation_name, password):
+        self.creds[nation_name] = password
 
-        if not self.dry_run_dispatches:
-            self.update_all_dispatches()
-        else:
-            self.update_dispatches(self.dry_run_dispatches)
+    def remove_nation_cred(self, nation_name):
+        del self.creds[nation_name]
 
-    def get_allowed_dispatches(self):
-        """Get non-blacklisted dispatches.
 
-        Returns:
-            list: Dispatch file names.
-        """
+def main():
+    parser = argparse.ArgumentParser(description=info.DESCRIPTION)
+    parser.add_argument('dispatches', metavar='N', nargs='+', default=None,
+                        help='Update specified dispaches (All if none is specified)')
+    parser.add_argument('--add-nation', help="Add a nation's login credential")
+    parser.add_argument('--remove-nation', help="Remove a nation's login credential")
 
-        return [dispatch for dispatch in self.dispatch_config.keys()
-                if dispatch not in self.blacklist]
-
-    def update_all_dispatches(self):
-        """Update all dispatches except blacklisted ones.
-        """
-
-        dispatches = self.get_allowed_dispatches()
-        self.update_dispatches(dispatches)
-
-    def update_dispatches(self, dispatches):
-        """Update dispatches
-
-        Args:
-            dispatches (list): Dispatch file names.
-        """
-
-        for name in dispatches:
-            self.uploader.update_dispatch(name)
-
-    def create_all_dispatches(self):
-        """Create all dispatches except blacklisted ones.
-        """
-
-        dispatches = self.get_allowed_dispatches()
-        self.create_dispatches(dispatches)
-
-    def create_dispatches(self, dispatches):
-        """Create dispatches and add their ID.
-
-        Args:
-            dispatches (list): Dispatch file names.
-        """
-
-        for name in dispatches:
-            if name not in self.id_store:
-                html = self.uploader.create_dispatch(name)
-                self.id_store.add_id_from_html(name, html)

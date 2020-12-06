@@ -166,8 +166,6 @@ class TestBBComplexFormatters():
 
 
     def test_load_complex_formatters_with_non_existent_config(self, mock_bb_registry):
-        config = {'complex_formatter_path': 'test.py',
-                  'complex_formatter_config_path': 'ghghgh'}
         ins = bb_parser.BBComplexFormatters()
 
         ins.load_formatters(mock_bb_registry, 'test.py', 'non_existent.toml')

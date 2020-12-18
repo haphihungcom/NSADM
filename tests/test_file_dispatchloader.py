@@ -39,10 +39,21 @@ class TestIDStore():
         ins = file_dispatchloader.IDStore('test.json')
         ins['test1'] = 1234567
 
-        ins.load_from_dispatch_config({'dis1': {'id': 7654321, 'title': 'a'},
-                                       'dis2': {'title': 'a'}})
+        dispatch_config = {'nation1': {'test1': {'title': 'test_title',
+                                                 'ns_id': '1234567',
+                                                 'category': '1',
+                                                 'subcategory': '100'},
+                                       'test2': {'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'}},
+                           'nation2': {'test3': {'ns_id': '9876543',
+                                                 'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'}}}
 
-        assert ins == {'test1': 1234567, 'dis1': 7654321}
+        ins.load_from_dispatch_config(dispatch_config)
+
+        assert ins == {'test1': '1234567', 'test3': '9876543'}
 
     @mock.patch('json.dump')
     def test_save_when_saved_is_true(self, mock_json_dump, setup_test_file):
@@ -88,21 +99,91 @@ class TestLoadDispatchConfig():
         assert r == {'Test1': 'TestVal1', 'Test2': 'TestVal2'}
 
 
-class TestFileDispatchLoader():
-    def test_integration_no_id_store(self, toml_files, text_files):
+class TestMergeIDStore():
+    def test_merge_id_store(self):
         dispatch_config = {'nation1': {'test1': {'title': 'test_title',
                                                  'category': '1',
                                                  'subcategory': '100'},
-                                       'test2': {'ns_id': '123456',
+                                       'test2': {'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'},
+                                       'test3': {'ns_id': '543210',
+                                                 'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'},
+                                       'test4': {'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'}}}
+        id_store = {'test1': '123456', 'test2': '56789', 'test3': '988766'}
+
+        file_dispatchloader.merge_id_store(dispatch_config, id_store)
+
+        r = dispatch_config['nation1']
+        assert r['test1']['ns_id'] == '123456'
+        # ID defined in config has priority over those in ID store.
+        assert r['test3']['ns_id'] == '543210'
+        assert 'ns_id' not in r['test4']
+
+
+class TestFileDispatchLoader():
+    @pytest.fixture(scope='class')
+    def setup(self):
+        dispatch_config = {'nation1': {'test1': {'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'},
+                                       'test2': {'ns_id': '7654321',
+                                                 'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'}},
+                           'nation2': {'test3': {'ns_id': '9876543',
                                                  'title': 'test_title',
                                                  'category': '1',
                                                  'subcategory': '100'}}}
-        toml_files({'test.toml': dispatch_config})
-        text_files({'test1.txt': 'Test text'})
+
+        with open('test.toml', 'w') as f:
+            toml.dump(dispatch_config, f)
+
+        with open('test1.txt', 'w') as f:
+            f.write('Test text 1')
+
+        with open('test2.txt', 'w') as f:
+            f.write('Test text 2')
+
+        yield
+
+        os.remove('test.toml')
+        os.remove('test1.txt')
+        os.remove('test2.txt')
+        os.remove('test.json')
+
+    def test_integration_no_id_store(self, setup):
         config = {'file_dispatchloader': {'id_store_path': 'test.json',
                                           'dispatch_config_paths': 'test.toml',
-                                          'file_ext': 'txt'}}
+                                          'file_ext': 'txt',
+                                          'save_config_defined_id': True}}
         loader = file_dispatchloader.init_loader(config)
 
-        assert loader.id_store['test2'] == '123456'
-        assert file_dispatchloader.get_dispatch_text(loader, 'test1') == 'Test text'
+        r1 = file_dispatchloader.get_dispatch_config(loader)
+        r2 = file_dispatchloader.get_dispatch_text(loader, 'test1')
+        file_dispatchloader.add_dispatch_id(loader, 'test1', '1234567')
+
+        file_dispatchloader.cleanup_loader(loader)
+
+        assert r1['nation1']['test2']['ns_id'] == '7654321'
+        assert r2 == 'Test text 1'
+
+    def test_integration_with_existing_id_store(self, setup):
+        config = {'file_dispatchloader': {'id_store_path': 'test.json',
+                                          'dispatch_config_paths': 'test.toml',
+                                          'file_ext': 'txt',
+                                          'save_config_defined_id': True}}
+        loader = file_dispatchloader.init_loader(config)
+
+        r1 = file_dispatchloader.get_dispatch_config(loader)
+        r2 = file_dispatchloader.get_dispatch_text(loader, 'test2')
+
+        file_dispatchloader.cleanup_loader(loader)
+
+        assert r1['nation2']['test3']['ns_id'] == '9876543'
+        assert r1['nation1']['test1']['ns_id'] == '1234567'
+        assert r2 == 'Test text 2'

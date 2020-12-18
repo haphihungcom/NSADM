@@ -27,6 +27,7 @@ class IDStore(collections.UserDict):
     def load_from_json(self):
         """Load dispatch IDs from configured JSON file.
         """
+
         if self.id_store_path is None:
             return
 
@@ -45,11 +46,12 @@ class IDStore(collections.UserDict):
             dispatch_config (dict): Dispatch configuration.
         """
 
-        for name, info in dispatch_config.items():
-            try:
-                self.data[name] = info['id']
-            except KeyError:
-                pass
+        for nation in dispatch_config.keys():
+            for name, config in dispatch_config[nation].items():
+                try:
+                    self.data[name] = config['ns_id']
+                except KeyError:
+                    pass
 
         self.saved = False
 
@@ -75,6 +77,16 @@ class IDStore(collections.UserDict):
             json.dump(self.data, f)
             self.saved = True
             logger.debug('Saved id store: %r', self.data)
+
+
+def merge_id_store(dispatch_config, id_store):
+    for nation in dispatch_config.keys():
+        for name in dispatch_config[nation].keys():
+            if 'ns_id' not in dispatch_config[nation][name]:
+                try:
+                    dispatch_config[nation][name]['ns_id'] = id_store[name]
+                except KeyError:
+                    logger.debug('No dispatch id found for dispatch: "%s"', name)
 
 
 def load_dispatch_config(dispatch_config_path):
@@ -116,14 +128,22 @@ class FileDispatchLoader():
     def add_new_dispatch_id(self, name, dispatch_id):
         self.id_store[name] = dispatch_id
 
+    def save_id_store(self):
+        self.id_store.save()
+
 
 @loader_api.dispatch_loader
 def init_loader(config):
     this_config = config['file_dispatchloader']
 
     id_store = IDStore(this_config['id_store_path'])
+    id_store.load_from_json()
+
     dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
-    id_store.load_from_dispatch_config(dispatch_config)
+    merge_id_store(dispatch_config, id_store)
+
+    if this_config['save_config_defined_id']:
+        id_store.load_from_dispatch_config(dispatch_config)
 
     loader = FileDispatchLoader(id_store, dispatch_config, this_config['file_ext'])
 
@@ -143,3 +163,8 @@ def get_dispatch_text(loader, name):
 @loader_api.dispatch_loader
 def add_dispatch_id(loader, name, dispatch_id):
     return loader.add_new_dispatch_id(name, dispatch_id)
+
+
+@loader_api.dispatch_loader
+def cleanup_loader(loader):
+    loader.save_id_store()

@@ -69,7 +69,7 @@ class DispatchUpdater():
 
         Args:
             owner_nation (str): Nation name
-            dispatch_config (dict): Nation's dispatches' info
+            dispatch_config (dict): Nation's dispatch config
         """
 
         self.dispatch_api.login(owner_nation, self.creds[owner_nation])

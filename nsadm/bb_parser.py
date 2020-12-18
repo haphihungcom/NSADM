@@ -229,8 +229,7 @@ class BBParserLoader():
                 standalone=formatter.get('standalone', False),
                 render_embedded=formatter.get('render_embedded', True),
                 strip=formatter.get('strip', False),
-                swallow_trailing_newline=formatter.get('swallow_trailing_newline', False)
-            )
+                swallow_trailing_newline=formatter.get('swallow_trailing_newline', False))
 
             logger.debug('Loaded simple BBCode formatter: %r', formatter)
 
@@ -250,8 +249,7 @@ class BBParserLoader():
                 standalone=formatter.get('standalone', False),
                 render_embedded=formatter.get('render_embedded', True),
                 strip=formatter.get('strip', False),
-                swallow_trailing_newline=formatter.get('swallow_trailing_newline', False)
-            )
+                swallow_trailing_newline=formatter.get('swallow_trailing_newline', False))
             logger.debug('Loaded complex formatter "%s"', formatter['tag_name'])
 
 

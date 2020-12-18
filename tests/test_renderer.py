@@ -56,7 +56,7 @@ class TestDispatchRenderer():
         var_loader = mock.Mock(get_all_vars=mock.Mock(return_value=vars))
         dispatch_config = {'nation1': {'test1': {'ns_id': 1234567, 'title': 'ABC'},
                                        'test2': {'ns_id': 7890123, 'title': 'DEF'}}}
-        template_config = {'filters_path': 'tests/resources/filters.py'}
+        template_config = {'filter_path': 'tests/resources/filters.py'}
         bb_config = {'simple_formatter_path': 'tests/resources/bb_simple_formatters.toml',
                      'complex_formatter_path': 'tests/resources/bb_complex_formatters.py',
                       'complex_formatter_config_path': 'tests/resources/bb_complex_formatter_config.toml'}

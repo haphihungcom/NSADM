@@ -32,19 +32,19 @@ class TemplateRenderer():
 
         Args:
             dispatch_loader (str): Dispatch loader plugin.
-            filters_path (str): Path to filters file.
+            filter_path (str): Path to filters file.
     """
 
-    def __init__(self, dispatch_loader, filters_path):
-        self.filters_path = filters_path
+    def __init__(self, dispatch_loader, filter_path):
+        self.filter_path = filter_path
         template_loader = DispatchTemplateLoader(dispatch_loader)
         # Make access to undefined context variables generate logs.
         undef = jinja2.make_logging_undefined(logger=logger)
         self.env = jinja2.Environment(loader=template_loader, trim_blocks=True, undefined=undef)
 
     def load_filters(self):
-        if self.filters_path is not None:
-            filters = utils.get_funcs(self.filters_path)
+        if self.filter_path is not None:
+            filters = utils.get_funcs(self.filter_path)
             if filters is None:
                 logger.warning('Filter file not found!')
             else:
@@ -82,7 +82,7 @@ class DispatchRenderer():
 
     def __init__(self, dispatch_loader, var_loader, bb_config, template_config, dispatch_config):
         self.template_renderer = TemplateRenderer(dispatch_loader,
-                                                  template_config.get('filters_path', None))
+                                                  template_config.get('filter_path', None))
 
         self.bb_parser = bb_parser.BBParser(bb_config.get('simple_formatter_path', None),
                                             bb_config.get('complex_formatter_path', None),

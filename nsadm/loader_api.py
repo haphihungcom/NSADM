@@ -67,6 +67,17 @@ def add_dispatch_id(loader, name, id):
     pass
 
 
+@dispatch_loader_specs(firstresult=True)
+def cleanup_loader(loader):
+    """Cleanup loader and close it.
+
+    Args:
+        loader: Loader
+    """
+
+    pass
+
+
 @var_loader_specs
 def get_vars(config):
     """Get all variables as a dict.

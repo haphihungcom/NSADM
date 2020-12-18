@@ -15,6 +15,7 @@ class TestDispatchLoader():
                                     DISPATCH_LOADER_CONFIG)
         obj.load_loader()
         r = obj.get_dispatch_config()
+        obj.cleanup_loader()
 
         assert r == {'foo1': 'bar1', 'foo2': 'bar2'}
 
@@ -23,6 +24,7 @@ class TestDispatchLoader():
                                     DISPATCH_LOADER_CONFIG)
         obj.load_loader()
         r = obj.get_dispatch_text('test')
+        obj.cleanup_loader()
 
         assert r == 'Dispatch content of test'
 
@@ -31,8 +33,10 @@ class TestDispatchLoader():
                                     DISPATCH_LOADER_CONFIG)
         obj.load_loader()
         r = obj.add_dispatch_id('test', '123456')
+        obj.cleanup_loader()
 
         assert r
+
 
 VAR_LOADER_NAMES = ['varloader-test1', 'varloader-test2']
 VAR_LOADER_CONFIG = {'varloader-test1': {'key1': 'val1'},

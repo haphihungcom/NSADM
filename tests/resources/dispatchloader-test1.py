@@ -18,6 +18,9 @@ class DispatchLoaderTest1():
     def add_dispatch_id(self, name, id):
         return
 
+    def cleanup_loader(self):
+        return
+
 
 @loader_api.dispatch_loader
 def init_loader(config):
@@ -38,3 +41,8 @@ def get_dispatch_text(loader, name):
 def add_dispatch_id(loader, name, id):
     loader.add_dispatch_id(name, id)
     return True
+
+
+@loader_api.dispatch_loader
+def cleanup_loader(loader):
+    return loader.cleanup_loader()

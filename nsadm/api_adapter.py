@@ -98,7 +98,7 @@ class DispatchAPI(GeneralAPIAdapter):
 
         resp = self.owner_nation.command('dispatch',
                                          dispatch=action, mode=mode,
-                                         dispatchid=kwargs.get('dispatch_id', None),
+                                         dispatchid=kwargs.get('dispatchid', None),
                                          title=kwargs.get('title', None),
                                          text=kwargs.get('text', None),
                                          category=kwargs.get('category', None),
@@ -143,7 +143,7 @@ class DispatchAPI(GeneralAPIAdapter):
                              category=category,
                              subcategory=subcategory)
 
-    def delete_dispatch(self, dispatch_id):
+    def remove_dispatch(self, dispatch_id):
         """Delete a dispatch.
 
         Args:

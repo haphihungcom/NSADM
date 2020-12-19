@@ -99,8 +99,56 @@ class TestLoadDispatchConfig():
         assert r == {'Test1': 'TestVal1', 'Test2': 'TestVal2'}
 
 
+class TestDefineAction():
+    def test_with_configured_action_and_id_exist(self):
+        config = {'action': 'create', 'title': 'test title',
+                  'category': '1', 'subcategory': '100'}
+
+        r = file_dispatchloader.define_action('test1', config, id_dont_exist=False)
+
+        assert r == 'create'
+
+    def test_with_edit_action_and_id_dont_exist(self):
+        config = {'action' : 'edit', 'title': 'test title',
+                  'category': '1', 'subcategory': '100'}
+
+        r = file_dispatchloader.define_action('test1', config, id_dont_exist=True)
+
+        assert r == 'skip'
+
+    def test_with_no_configured_action_and_id_dont_exist(self):
+        config = {'title': 'test title', 'category': '1', 'subcategory': '100'}
+
+        r = file_dispatchloader.define_action('test1', config, id_dont_exist=True)
+
+        assert r == 'create'
+
+    def test_with_no_configured_action_and_id_exist(self):
+        config = {'title': 'test title', 'category': '1', 'subcategory': '100'}
+
+        r = file_dispatchloader.define_action('test1', config, id_dont_exist=False)
+
+        assert r == 'edit'
+
+    def test_with_remove_action_and_id_exist(self):
+        config = {'action': 'remove', 'title': 'test title',
+                  'category': '1', 'subcategory': '100'}
+
+        r = file_dispatchloader.define_action('test1', config, id_dont_exist=False)
+
+        assert r == 'remove'
+
+    def test_with_remove_action_and_id_dont_exist(self):
+        config = {'action': 'remove', 'title': 'test title',
+                  'category': '1', 'subcategory': '100'}
+
+        r = file_dispatchloader.define_action('test1', config, id_dont_exist=True)
+
+        assert r == 'skip'
+
+
 class TestMergeIDStore():
-    def test_merge_id_store(self):
+    def test(self):
         dispatch_config = {'nation1': {'test1': {'title': 'test_title',
                                                  'category': '1',
                                                  'subcategory': '100'},
@@ -122,17 +170,17 @@ class TestMergeIDStore():
                                                  'subcategory': '100'}}}
         id_store = {'test1': '123456', 'test2': '567890', 'test3': '988766'}
 
-        file_dispatchloader.merge_with_id_store(dispatch_config, id_store)
+        r = file_dispatchloader.merge_with_id_store(dispatch_config, id_store)['nation1']
 
-        r = dispatch_config['nation1']
         assert r['test1']['ns_id'] == '123456' and r['test1']['action'] == 'edit'
         assert r['test2']['ns_id'] == '567890' and r['test2']['action'] == 'remove'
+        assert 'test2' not in id_store
         # ID defined in config has priority over those in ID store.
         assert r['test3']['ns_id'] == '543210'
         assert r['test4']['action'] == 'create'
         assert r['test5']['ns_id'] == '987654' and r['test5']['action'] == 'remove'
 
-    def test_merge_id_store_with_remove_action_and_non_existing_id(self):
+    def test_with_remove_action_and_non_existing_id(self):
         dispatch_config = {'nation1': {'test1': {'title': 'test_title',
                                                  'category': '1',
                                                  'subcategory': '100'},
@@ -142,9 +190,9 @@ class TestMergeIDStore():
                                                  'subcategory': '100'}}}
         id_store = {'test1': '123456'}
 
-        file_dispatchloader.merge_with_id_store(dispatch_config, id_store)
+        r = file_dispatchloader.merge_with_id_store(dispatch_config, id_store)
 
-        assert dispatch_config['nation1']['test2']['action'] == 'skip'
+        assert 'test2' not in r['nation1']
 
 
 class TestFileDispatchLoader():

@@ -80,31 +80,54 @@ class IDStore(collections.UserDict):
             logger.debug('Saved id store: %r', self.data)
 
 
+def define_action(name, config, id_dont_exist):
+    # Use user-configured action if exists
+    if 'action' in config:
+        if config['action'] == 'remove' and id_dont_exist:
+            logger.error('No dispatch id found for dispatch "%s". Will not remove it.', name)
+            return 'skip'
+        elif config['action'] == 'edit' and id_dont_exist:
+            logger.error('No dispatch id found for dispatch "%s". Will not edit it.', name)
+            return 'skip'
+
+        return config['action']
+
+    if id_dont_exist:
+        logger.debug('No dispatch id found for dispatch "%s". Will attempt to create the dispatch.', name)
+        return 'create'
+    else:
+        return 'edit'
+
+
 def merge_with_id_store(dispatch_config, id_store):
+    new_dispatch_config = {}
     for nation in dispatch_config.keys():
-        current_config = copy.copy(dispatch_config[nation])
-        for name in current_config.keys():
-            id_not_in_store = False
+        new_dispatch_config[nation] = {}
+        for name in dispatch_config[nation].keys():
+            config = dispatch_config[nation][name]
+            id_dont_exist = False
+            id_user_defined = True
             # Use user-configured dispatch id if exists
-            if 'ns_id' not in current_config[name]:
+            if 'ns_id' not in config:
+                id_user_defined = False
                 if name in id_store:
-                    current_config[name]['ns_id'] = id_store[name]
+                    config['ns_id'] = id_store[name]
                 else:
-                    id_not_in_store = True
+                    id_dont_exist = True
 
-            # Use user-configured action if exists
-            if 'action' in current_config[name]:
-                if current_config[name]['action'] == 'remove' and id_not_in_store:
-                    logger.error('No dispatch id found for dispatch "%s". Cannot remove it.', name)
-                    current_config[name]['action'] = 'skip'
-
+            action = define_action(name, config, id_dont_exist)
+            if action == 'skip':
                 continue
 
-            if id_not_in_store:
-                logger.debug('No dispatch id found for dispatch "%s". Attempting to create the dispatch', name)
-                current_config[name]['action'] = 'create'
-            else:
-                current_config[name]['action'] = 'edit'
+            config['action'] = action
+            new_dispatch_config[nation][name] = config
+
+            # Only delete id in store if the id of dispatch to remove
+            # is not user-configured
+            if action == 'remove' and not id_user_defined:
+                del id_store[name]
+
+    return new_dispatch_config
 
 
 def load_dispatch_config(dispatch_config_path):
@@ -158,7 +181,7 @@ def init_loader(config):
     id_store.load_from_json()
 
     dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
-    merge_with_id_store(dispatch_config, id_store)
+    dispatch_config = merge_with_id_store(dispatch_config, id_store)
 
     if this_config['save_config_defined_id']:
         id_store.load_from_dispatch_config(dispatch_config)

@@ -104,7 +104,8 @@ class TestMergeIDStore():
         dispatch_config = {'nation1': {'test1': {'title': 'test_title',
                                                  'category': '1',
                                                  'subcategory': '100'},
-                                       'test2': {'title': 'test_title',
+                                       'test2': {'action': 'remove',
+                                                 'title': 'test_title',
                                                  'category': '1',
                                                  'subcategory': '100'},
                                        'test3': {'ns_id': '543210',
@@ -113,16 +114,37 @@ class TestMergeIDStore():
                                                  'subcategory': '100'},
                                        'test4': {'title': 'test_title',
                                                  'category': '1',
+                                                 'subcategory': '100'},
+                                       'test5': {'action': 'remove',
+                                                 'ns_id': '987654',
+                                                 'title': 'test_title',
+                                                 'category': '1',
                                                  'subcategory': '100'}}}
-        id_store = {'test1': '123456', 'test2': '56789', 'test3': '988766'}
+        id_store = {'test1': '123456', 'test2': '567890', 'test3': '988766'}
 
-        file_dispatchloader.merge_id_store(dispatch_config, id_store)
+        file_dispatchloader.merge_with_id_store(dispatch_config, id_store)
 
         r = dispatch_config['nation1']
-        assert r['test1']['ns_id'] == '123456'
+        assert r['test1']['ns_id'] == '123456' and r['test1']['action'] == 'edit'
+        assert r['test2']['ns_id'] == '567890' and r['test2']['action'] == 'remove'
         # ID defined in config has priority over those in ID store.
         assert r['test3']['ns_id'] == '543210'
-        assert 'ns_id' not in r['test4']
+        assert r['test4']['action'] == 'create'
+        assert r['test5']['ns_id'] == '987654' and r['test5']['action'] == 'remove'
+
+    def test_merge_id_store_with_remove_action_and_non_existing_id(self):
+        dispatch_config = {'nation1': {'test1': {'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'},
+                                       'test2': {'action': 'remove',
+                                                 'title': 'test_title',
+                                                 'category': '1',
+                                                 'subcategory': '100'}}}
+        id_store = {'test1': '123456'}
+
+        file_dispatchloader.merge_with_id_store(dispatch_config, id_store)
+
+        assert dispatch_config['nation1']['test2']['action'] == 'skip'
 
 
 class TestFileDispatchLoader():
@@ -135,7 +157,8 @@ class TestFileDispatchLoader():
                                                  'title': 'test_title',
                                                  'category': '1',
                                                  'subcategory': '100'}},
-                           'nation2': {'test3': {'ns_id': '9876543',
+                           'nation2': {'test3': {'action': 'remove',
+                                                 'ns_id': '5656565',
                                                  'title': 'test_title',
                                                  'category': '1',
                                                  'subcategory': '100'}}}
@@ -170,6 +193,7 @@ class TestFileDispatchLoader():
         file_dispatchloader.cleanup_loader(loader)
 
         assert r1['nation1']['test2']['ns_id'] == '7654321'
+        assert r1['nation1']['test1']['action'] == 'create'
         assert r2 == 'Test text 1'
 
     def test_integration_with_existing_id_store(self, setup):
@@ -184,6 +208,6 @@ class TestFileDispatchLoader():
 
         file_dispatchloader.cleanup_loader(loader)
 
-        assert r1['nation2']['test3']['ns_id'] == '9876543'
-        assert r1['nation1']['test1']['ns_id'] == '1234567'
+        assert r1['nation2']['test3']['ns_id'] == '5656565' and r1['nation2']['test3']['action'] == 'remove'
+        assert r1['nation1']['test1']['ns_id'] == '1234567' and r1['nation1']['test1']['action'] == 'edit'
         assert r2 == 'Test text 2'

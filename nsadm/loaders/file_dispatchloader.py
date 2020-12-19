@@ -1,4 +1,5 @@
 import collections
+import copy
 import json
 import logging
 import toml
@@ -79,14 +80,31 @@ class IDStore(collections.UserDict):
             logger.debug('Saved id store: %r', self.data)
 
 
-def merge_id_store(dispatch_config, id_store):
+def merge_with_id_store(dispatch_config, id_store):
     for nation in dispatch_config.keys():
-        for name in dispatch_config[nation].keys():
-            if 'ns_id' not in dispatch_config[nation][name]:
-                try:
-                    dispatch_config[nation][name]['ns_id'] = id_store[name]
-                except KeyError:
-                    logger.debug('No dispatch id found for dispatch: "%s"', name)
+        current_config = copy.copy(dispatch_config[nation])
+        for name in current_config.keys():
+            id_not_in_store = False
+            # Use user-configured dispatch id if exists
+            if 'ns_id' not in current_config[name]:
+                if name in id_store:
+                    current_config[name]['ns_id'] = id_store[name]
+                else:
+                    id_not_in_store = True
+
+            # Use user-configured action if exists
+            if 'action' in current_config[name]:
+                if current_config[name]['action'] == 'remove' and id_not_in_store:
+                    logger.error('No dispatch id found for dispatch "%s". Cannot remove it.', name)
+                    current_config[name]['action'] = 'skip'
+
+                continue
+
+            if id_not_in_store:
+                logger.debug('No dispatch id found for dispatch "%s". Attempting to create the dispatch', name)
+                current_config[name]['action'] = 'create'
+            else:
+                current_config[name]['action'] = 'edit'
 
 
 def load_dispatch_config(dispatch_config_path):
@@ -140,7 +158,7 @@ def init_loader(config):
     id_store.load_from_json()
 
     dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
-    merge_id_store(dispatch_config, id_store)
+    merge_with_id_store(dispatch_config, id_store)
 
     if this_config['save_config_defined_id']:
         id_store.load_from_dispatch_config(dispatch_config)

@@ -6,4 +6,4 @@ from unittest import mock
 import pytest
 import toml
 
-from nsadm import nsadm
+import nsadm

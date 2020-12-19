@@ -27,6 +27,7 @@ class TestCredManager():
         creds['nation1'] = 'hunterprime'
 
         mock_cred_loader.add_cred.assert_called_with('nation1', '123456')
+        mock_dispatch_api.login('nation1', password='123456')
 
     def test_remove_cred(self):
         mock_cred_loader = mock.Mock(remove_cred=mock.Mock())

@@ -27,14 +27,14 @@ class CredManager(collections.UserDict):
         self.data = self.cred_loader.get_creds()
 
     def __setitem__(self, nation_name, password):
-        """Add a new crendential with X-Autologin.
+        """Add a new credential with X-Autologin.
 
         Args:
             nation_name (str): Nation name
             password (str): Password
         """
 
-        x_autologin = self.dispatch_api.login(nation_name, password)
+        x_autologin = self.dispatch_api.login(nation_name, password=password)
         self.cred_loader.add_cred(nation_name, x_autologin)
 
     def __delitem__(self, nation_name):

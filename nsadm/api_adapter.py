@@ -17,21 +17,29 @@ class GeneralAPIAdapter():
         self.api = ns_api
         self.owner_nation = None
 
-    def login(self, nation_name, password):
+    def login(self, nation_name, password=None, autologin=None):
         """Get nation and test login.
 
         Args:
             nation_name (str): Nation name
             password (str): Nation password
+
+        Returns:
+            str: X-Autologin
         """
 
-        self.owner_nation = self.api.nation(nation_name, password)
+        if autologin is None:
+            self.owner_nation = self.api.nation(nation_name, password=password)
+        else:
+            self.owner_nation = self.api.nation(nation_name, autologin=autologin)
 
         try:
-            r = self.owner_nation.get_shards('ping', full_response=True)
-            return r['headers']['X-Autologin']
+            resp_headers = self.owner_nation.get_shards('ping', full_response=True)['headers']
         except nationstates.exceptions.Forbidden:
             raise exceptions.DispatchAPIError('Could not log into your nation!')
+
+        if 'X-Autologin' in resp_headers:
+            return resp_headers['X-Autologin']
 
     def send_command(self, action, mode, **kwargs):
         raise NotImplementedError
@@ -108,7 +116,7 @@ class DispatchAPI(GeneralAPIAdapter):
             str: New dispatch ID
         """
 
-        r = self.execute_command('create', title=title,
+        r = self.execute_command('add', title=title,
                                  text=text,
                                  category=category,
                                  subcategory=subcategory)

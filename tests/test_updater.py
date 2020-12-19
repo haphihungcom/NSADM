@@ -36,7 +36,7 @@ class TestDispatchUpdater():
 
         ins.login_owner_nation('test_nation', dispatch_config)
 
-        login.assert_called_with('test_nation', '12345')
+        login.assert_called_with('test_nation', autologin='12345')
         assert ins.dispatch_config == dispatch_config
 
     def test_create_dispatch(self):

@@ -72,7 +72,7 @@ class DispatchUpdater():
             dispatch_config (dict): Nation's dispatch config
         """
 
-        self.dispatch_api.login(owner_nation, self.creds[owner_nation])
+        self.dispatch_api.login(owner_nation, autologin=self.creds[owner_nation])
         self.dispatch_config = dispatch_config
 
     def update_dispatch(self, name):

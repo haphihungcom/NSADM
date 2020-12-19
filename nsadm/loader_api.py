@@ -55,13 +55,13 @@ def get_dispatch_text(loader, name):
 
 
 @dispatch_loader_specs(firstresult=True)
-def add_dispatch_id(loader, name, id):
+def add_dispatch_id(loader, name, dispatch_id):
     """Add or update dispatch ID when a new dispatch is made.
 
     Args:
         loader: Loader
         name (str): Dispatch name
-        id (str): Dispatch ID
+        dispatch_id (str): Dispatch ID
     """
 
     pass

@@ -38,8 +38,8 @@ def get_dispatch_text(loader, name):
 
 
 @loader_api.dispatch_loader
-def add_dispatch_id(loader, name, id):
-    loader.add_dispatch_id(name, id)
+def add_dispatch_id(loader, name, dispatch_id):
+    loader.add_dispatch_id(name, dispatch_id)
     return True
 
 

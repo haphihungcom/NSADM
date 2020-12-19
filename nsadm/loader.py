@@ -78,7 +78,7 @@ class DispatchLoader(Loader):
         return self.manager.hook.get_dispatch_text(loader=self._loader, name=name)
 
     def add_dispatch_id(self, name, id):
-        return self.manager.hook.add_dispatch_id(loader=self._loader, name=name, id=id)
+        return self.manager.hook.add_dispatch_id(loader=self._loader, name=name, dispatch_id=id)
 
     def cleanup_loader(self):
         self.manager.hook.cleanup_loader(loader=self._loader)

@@ -181,10 +181,11 @@ def init_loader(config):
     id_store.load_from_json()
 
     dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
-    dispatch_config = merge_with_id_store(dispatch_config, id_store)
 
     if this_config['save_config_defined_id']:
         id_store.load_from_dispatch_config(dispatch_config)
+
+    dispatch_config = merge_with_id_store(dispatch_config, id_store)
 
     loader = FileDispatchLoader(id_store, dispatch_config, this_config['file_ext'])
 

@@ -77,10 +77,9 @@ class DispatchRenderer():
         var_loader: Var loader
         bb_config (dict): BBCode parser configuration
         template_config (dict): Template renderer configuration
-        dispatch_config (dict): Dispatch configuration
     """
 
-    def __init__(self, dispatch_loader, var_loader, bb_config, template_config, dispatch_config):
+    def __init__(self, dispatch_loader, var_loader, bb_config, template_config):
         self.template_renderer = TemplateRenderer(dispatch_loader,
                                                   template_config.get('filter_path', None))
 
@@ -88,13 +87,12 @@ class DispatchRenderer():
                                             bb_config.get('complex_formatter_path', None),
                                             bb_config.get('complex_formatter_config_path', None))
 
-        self.dispatch_config = dispatch_config
         self.var_loader = var_loader
 
         # Context all dispatches will have
         self.global_context = {}
 
-    def load(self):
+    def load(self, dispatch_config):
         """Load template renderer filters, BBCode formatters, and setup context.
         """
 
@@ -102,7 +100,7 @@ class DispatchRenderer():
         self.bb_parser.load_formatters()
 
         self.global_context = self.var_loader.get_all_vars()
-        self.global_context['dispatch_info'] = utils.get_dispatch_info(self.dispatch_config)
+        self.global_context['dispatch_info'] = utils.get_dispatch_info(dispatch_config)
 
     def render(self, name):
         """Render a dispatch.

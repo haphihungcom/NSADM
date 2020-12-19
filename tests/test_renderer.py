@@ -60,8 +60,8 @@ class TestDispatchRenderer():
         bb_config = {'simple_formatter_path': 'tests/resources/bb_simple_formatters.toml',
                      'complex_formatter_path': 'tests/resources/bb_complex_formatters.py',
                       'complex_formatter_config_path': 'tests/resources/bb_complex_formatter_config.toml'}
-        ins = renderer.DispatchRenderer(dispatch_loader, var_loader, bb_config, template_config, dispatch_config)
-        ins.load()
+        ins = renderer.DispatchRenderer(dispatch_loader, var_loader, bb_config, template_config)
+        ins.load(dispatch_config)
 
         expected = ('[simple1r]1and1[/simple1r][simple1r]2and1[/simple1r][simple1r]3and1[/simple1r]'
                     '[complexr]marrytest1[/complexr][complexcfgr=testcfgval]val1[/complexcfgr]')

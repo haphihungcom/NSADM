@@ -98,11 +98,11 @@ class TestDispatchUpdater():
                                              'subcategory': '100',
                                              'ns_id': '12345',
                                              'action': 'remove'}}
-        ins.delete_dispatch = mock.Mock()
+        ins.remove_dispatch = mock.Mock()
 
         ins.update_dispatch('test_name')
 
-        ins.delete_dispatch.assert_called_with('12345')
+        ins.remove_dispatch.assert_called_with('12345')
 
     def test_update_dispatch_with_no_remove_action(self):
         mock_obj = mock.Mock()

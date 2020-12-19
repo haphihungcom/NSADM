@@ -87,7 +87,7 @@ class DispatchUpdater():
 
         if action == 'remove':
             dispatch_id = this_dispatch_config['ns_id']
-            self.delete_dispatch(dispatch_id)
+            self.remove_dispatch(dispatch_id)
         else:
             self.create_or_edit_dispatch(name, action, this_dispatch_config)
 
@@ -162,11 +162,11 @@ class DispatchUpdater():
                                         category=params['category'],
                                         subcategory=params['subcategory'])
 
-    def delete_dispatch(self, dispatch_id):
+    def remove_dispatch(self, dispatch_id):
         """Delete a dispatch.
 
         Args:
             dispatch_id (str): Dispatch ID
         """
-        self.dispatch_api.delete_dispatch(dispatch_id)
+        self.dispatch_api.remove_dispatch(dispatch_id)
 

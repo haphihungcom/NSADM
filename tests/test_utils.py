@@ -47,7 +47,7 @@ class TestGetDispatchInfo():
                                                      'ns_id': '7654321',
                                                      'category': '2',
                                                      'subcategory': '120'}},
-                           'nation2': {'dispatch1': {'title': 'Test Title 1',
+                           'nation2': {'dispatch3': {'title': 'Test Title 1',
                                                     'ns_id': '1234567',
                                                     'category': '1',
                                                     'subcategory': '100'}}}
@@ -63,7 +63,7 @@ class TestGetDispatchInfo():
                                    'category': '2',
                                    'subcategory': '120',
                                    'owner_nation': 'nation1'},
-                    'dispatch1': {'title': 'Test Title 1',
+                    'dispatch3': {'title': 'Test Title 1',
                                    'ns_id': '1234567',
                                    'category': '1',
                                    'subcategory': '100',

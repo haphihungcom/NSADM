@@ -1,6 +1,8 @@
 """Adapter for the pynationstates NS API wrapper
 """
 
+import re
+
 import nationstates
 
 from nsadm import exceptions
@@ -121,7 +123,8 @@ class DispatchAPI(GeneralAPIAdapter):
                                  category=category,
                                  subcategory=subcategory)
 
-        return r['success']
+        new_dispatch_id = re.search('id=(\\d+)', r['success']).group(1)
+        return new_dispatch_id
 
     def edit_dispatch(self, dispatch_id, title, text, category, subcategory):
         """Edit a dispatch.

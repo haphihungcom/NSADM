@@ -11,7 +11,7 @@ def mock_ns_response(*args, **kwargs):
     if kwargs['mode'] == 'prepare':
         return {'success': '1234abcd'}
     elif kwargs['mode'] == 'execute' and kwargs['token'] == '1234abcd':
-        return {'success': 'Done'}
+        return {'success': 'New factbook posted! <a href="/nation=test/detail=factbook/id=1234567">View Your Factbook</a>'}
 
 
 class TestDispatchAPI():
@@ -71,3 +71,13 @@ class TestDispatchAPI():
         mock_nation.command.assert_called_with('dispatch', dispatch='create', mode='execute', dispatchid=None,
                                                title='test', text='hello world', category='1', subcategory='100',
                                                token='1234abcd')
+
+    def test_create_dispatch(self):
+        resp = 'New factbook posted! <a href="/nation=test/detail=factbook/id=1234567">View Your Factbook</a>'
+        dispatch_api = api_adapter.DispatchAPI(mock.Mock())
+        dispatch_api.execute_command = mock.Mock(return_value={'success': resp})
+
+        r = dispatch_api.create_dispatch(title='test', text='hello world',
+                                         category='1', subcategory='100')
+
+        assert r == '1234567'

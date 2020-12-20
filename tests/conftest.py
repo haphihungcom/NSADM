@@ -1,5 +1,5 @@
 import os
-import configparser
+import json
 from unittest import mock
 
 import toml
@@ -35,6 +35,25 @@ def text_files():
         for name, text in files.items():
             with open(name, 'w') as f:
                 f.write(text)
+                existing_files.append(name)
+
+    yield gen_mock_files
+
+    for name in existing_files:
+        os.remove(name)
+
+
+@pytest.fixture
+def json_files():
+    """Create JSON files for testing.
+    """
+
+    existing_files = []
+
+    def gen_mock_files(files={'test.json': {}}):
+        for name, content in files.items():
+            with open(name, 'w') as f:
+                json.dump(content, f)
                 existing_files.append(name)
 
     yield gen_mock_files

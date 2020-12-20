@@ -6,6 +6,8 @@ from unittest import mock
 import pytest
 import toml
 
+
+from nsadm import exceptions
 from nsadm import updater
 
 
@@ -89,6 +91,20 @@ class TestDispatchUpdater():
                                               'text': 'test_text',
                                               'category': '1',
                                               'subcategory': '100'})
+
+    def test_create_or_edit_dispatch_with_fail_to_get_text(self, caplog):
+        mock_obj = mock.Mock()
+        ins = updater.DispatchUpdater(mock_obj, mock_obj, mock_obj, mock_obj)
+        ins.edit_dispatch = mock.Mock()
+        ins.get_dispatch_text = mock.Mock(side_effect=exceptions.LoaderError)
+        this_dispatch_config = {'title': 'test_title',
+                                'category': '1',
+                                'subcategory': '100',
+                                'ns_id': '12345'}
+
+        ins.create_or_edit_dispatch('test_name', 'edit', this_dispatch_config)
+
+        assert caplog.records[-1].levelname == 'ERROR'
 
     def test_update_dispatch_with_remove_action(self):
         mock_obj = mock.Mock()

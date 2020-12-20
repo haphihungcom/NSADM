@@ -5,6 +5,7 @@ import logging
 import toml
 
 
+from nsadm import exceptions
 from nsadm import loader_api
 
 
@@ -168,12 +169,12 @@ class FileDispatchLoader():
 
     def get_dispatch_text(self, name):
         filename = '{}.{}'.format(name, self.file_ext)
-        text = None
         try:
             with open(filename) as f:
                 text = f.read()
         except FileNotFoundError:
             logger.error('Dispatch template file "%s" not found.', filename)
+            raise exceptions.LoaderError
 
         return text
 

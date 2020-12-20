@@ -119,7 +119,12 @@ class DispatchUpdater():
         subcategory = this_dispatch_config['subcategory']
         category_num, subcategory_num = get_category_number(category, subcategory)
         title = this_dispatch_config['title']
-        text = self.get_dispatch_text(name)
+
+        try:
+            text = self.get_dispatch_text(name)
+        except exceptions.LoaderError:
+            logger.error('Failed to get text content of dispatch "%s".', name)
+            return
 
         params = {'title': title,
                   'text': text,
@@ -132,7 +137,7 @@ class DispatchUpdater():
             dispatch_id = this_dispatch_config['ns_id']
             self.edit_dispatch(dispatch_id, params)
         else:
-            raise exceptions.DispatchUpdatingError
+            raise exceptions.DispatchUpdatingError('Invalid action "{}" on dispatch "{}".', action, name)
 
     def create_dispatch(self, name, params):
         """Create a dispatch.

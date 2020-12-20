@@ -6,6 +6,7 @@ from unittest import mock
 
 import pytest
 
+from nsadm import exceptions
 from nsadm.loaders import file_dispatchloader
 
 
@@ -308,7 +309,8 @@ class TestFileDispatchLoaderObj():
 
         obj = file_dispatchloader.FileDispatchLoader({}, {}, 'txt')
 
-        assert obj.get_dispatch_text('test2') == None
+        with pytest.raises(exceptions.LoaderError):
+            obj.get_dispatch_text('test2')
 
 
 class TestFileDispatchLoader():

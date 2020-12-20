@@ -9,7 +9,6 @@ import pytest
 from nsadm.loaders import file_dispatchloader
 
 
-# TODO: Refactor
 class TestIDStore():
     @pytest.fixture
     def setup_test_file(self):

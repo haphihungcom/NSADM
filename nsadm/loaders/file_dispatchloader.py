@@ -49,10 +49,13 @@ class IDStore(collections.UserDict):
 
         for nation in dispatch_config.keys():
             for name, config in dispatch_config[nation].items():
-                try:
-                    self.data[name] = config['ns_id']
-                except KeyError:
-                    pass
+                if 'action' in config and config['action'] == 'remove':
+                    continue
+
+                if 'ns_id' not in config:
+                    continue
+
+                self.data[name] = config['ns_id']
 
         self.saved = False
 

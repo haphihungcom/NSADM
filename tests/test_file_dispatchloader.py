@@ -295,6 +295,22 @@ class TestMergeIDStore():
         assert 'nation1' not in r
 
 
+class TestFileDispatchLoaderObj():
+    def test_get_dispatch_text(self, text_files):
+        text_files({'test1.txt': 'Test text 1', 'test2.txt': 'Test text 2'})
+
+        obj = file_dispatchloader.FileDispatchLoader({}, {}, 'txt')
+
+        assert obj.get_dispatch_text('test1') == 'Test text 1'
+
+    def test_get_dispatch_text_with_non_existing_file(self, text_files):
+        text_files({'test1.txt': 'Test text 1'})
+
+        obj = file_dispatchloader.FileDispatchLoader({}, {}, 'txt')
+
+        assert obj.get_dispatch_text('test2') == None
+
+
 class TestFileDispatchLoader():
     @pytest.fixture
     def setup_text_files(self, text_files):

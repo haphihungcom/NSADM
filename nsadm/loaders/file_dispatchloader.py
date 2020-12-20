@@ -130,6 +130,10 @@ def merge_with_id_store(dispatch_config, id_store):
             if action == 'remove' and not id_user_defined:
                 del id_store[name]
 
+        # Delete this nation to avoid useless login
+        if not new_dispatch_config[nation]:
+            del new_dispatch_config[nation]
+
     return new_dispatch_config
 
 
@@ -180,15 +184,17 @@ class FileDispatchLoader():
 def init_loader(config):
     this_config = config['file_dispatchloader']
 
+    dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
+    if not dispatch_config:
+        logger.error('Dispatch config is empty!')
+
     id_store = IDStore(this_config['id_store_path'])
     id_store.load_from_json()
 
-    dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
+    dispatch_config = merge_with_id_store(dispatch_config, id_store)
 
     if this_config['save_config_defined_id']:
         id_store.load_from_dispatch_config(dispatch_config)
-
-    dispatch_config = merge_with_id_store(dispatch_config, id_store)
 
     loader = FileDispatchLoader(id_store, dispatch_config, this_config['file_ext'])
 

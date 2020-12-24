@@ -70,31 +70,38 @@ class NSADM():
         self.dispatch_loader.cleanup_loader()
 
 
-def main():
-    with open(info.CONFIG_PATH) as f:
-        config = toml.load(f)
-
+def cli():
     parser = argparse.ArgumentParser(description=info.DESCRIPTION)
     subparsers = parser.add_subparsers(help='Sub-command help')
 
-    cred_command = subparsers.add_parser('cred', help='Nation credential commands')
-    cred_command.add_argument('--add', nargs=2, help='Add nation credential')
-    cred_command.add_argument('--remove', nargs=1, help='Remove nation credential')
+    cred_command = subparsers.add_parser('cred', help='Nation login credential management')
+    cred_command.add_argument('--add', nargs=2, metavar=('NAME', 'PASSWORD'),
+                              help='Add new login credential')
+    cred_command.add_argument('--remove', nargs=1, metavar='NAME',
+                              help='Remove login credential')
 
-    parser.add_argument('dispatches', nargs='*', default=None, metavar='N', help='Names of dispatches to update')
+    parser.add_argument('dispatches', nargs='*', default=None, metavar='N',
+                        help='Names of dispatches to update (Leave blank means all)')
 
-    parse_results = parser.parse_args()
+    return parser.parse_args()
+
+
+def main():
+    inputs = cli()
+
+    with open(info.CONFIG_PATH) as f:
+        config = toml.load(f)
 
     app = NSADM(config)
     app.soft_load()
 
-    if hasattr(parse_results, 'add'):
-        app.add_nation_cred(parse_results.add[0], parse_results.add[1])
-    elif hasattr(parse_results, 'remove'):
-        app.remove_nation_cred(parse_results.remove[0])
+    if hasattr(inputs, 'add'):
+        app.add_nation_cred(inputs.add[0], inputs.add[1])
+    elif hasattr(inputs, 'remove'):
+        app.remove_nation_cred(inputs.remove[0])
     else:
         app.load()
-        app.update_dispatches(parse_results.dispatches)
+        app.update_dispatches(inputs.dispatches)
 
     app.close()
 

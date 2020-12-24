@@ -1,8 +1,9 @@
 """ Utilities for this plugin.
 """
 
-
+import os
 import collections
+import shutil
 import inspect
 import logging
 import json
@@ -10,6 +11,10 @@ import importlib
 
 import toml
 import bs4
+import appdirs
+
+from nsadm import info
+from nsadm import exceptions
 
 
 logger = logging.getLogger(__name__)
@@ -39,6 +44,30 @@ class CredManager(collections.UserDict):
 
     def __delitem__(self, nation_name):
         self.cred_loader.remove_cred(nation_name)
+
+
+def get_config_from_toml(config_path):
+    with open(config_path) as f:
+        return toml.load(f)
+
+
+def get_config():
+    config_path = os.getenv(info.CONFIG_ENVVAR)
+    config = None
+    if config_path:
+        try:
+            config = get_config_from_toml(config_path)
+        except FileNotFoundError:
+            raise exceptions.ConfigError('Could not find config file {}'.format(config_path))
+
+    config_path = os.path.join(appdirs.user_config_dir(info.APP_NAME, info.AUTHOR), info.CONFIG_NAME)
+    try:
+        config = get_config_from_toml(config_path)
+    except FileNotFoundError:
+        shutil.copyfile(info.DEFAULT_CONFIG_PATH, config_path)
+        raise exceptions.ConfigError('Could not find config.toml. First time run? Created one in {}. Please edit it.'.format(config_path))
+
+    return config
 
 
 def get_dispatch_info(dispatch_config):

@@ -1,3 +1,7 @@
+APP_NAME = 'nsadm'
+AUTHOR = 'ns_usovietnam'
+DESCRIPTION = 'Automatically update and format dispatches.'
+
 # Pluggy project name for loader plugins.
 DISPATCH_LOADER_PROJ = 'NSADMDispatchLoader'
 VAR_LOADER_PROJ = 'NSADMVarLoader'
@@ -6,11 +10,10 @@ CRED_LOADER_PROJ = 'NSADMCredLoader'
 # Loader plugin directory path.
 LOADER_DIR_PATH = 'loaders'
 
-# General configuration path
-CONFIG_PATH = 'config.toml'
-
-# Description of --help
-DESCRIPTION = 'Automatically update and format dispatches.'
+CONFIG_ENVVAR = 'NSADM_CONFIG'
+CONFIG_NAME = 'config.toml'
+# Default general configuration path for copying to proper place
+DEFAULT_CONFIG_PATH = 'nsadm/config.toml'
 
 # Category name and code reference.
 SUBCATEGORIES_1 = {'overview': '100',

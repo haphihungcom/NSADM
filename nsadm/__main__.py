@@ -86,15 +86,7 @@ def cli():
     return parser.parse_args()
 
 
-def main():
-    inputs = cli()
-
-    with open(info.CONFIG_PATH) as f:
-        config = toml.load(f)
-
-    app = NSADM(config)
-    app.soft_load()
-
+def run(app, inputs):
     if hasattr(inputs, 'add'):
         app.add_nation_cred(inputs.add[0], inputs.add[1])
     elif hasattr(inputs, 'remove'):
@@ -103,7 +95,23 @@ def main():
         app.load()
         app.update_dispatches(inputs.dispatches)
 
-    app.close()
+
+def main():
+    inputs = cli()
+
+    try:
+        config = utils.get_config()
+    except exceptions.ConfigError as e:
+        print(e)
+        return
+
+    try:
+        app = NSADM(config)
+        app.soft_load()
+        run(app, inputs)
+        app.close()
+    except Exception as e:
+        logger.critical(e, exc_info=True)
 
 
 if __name__ == "__main__":

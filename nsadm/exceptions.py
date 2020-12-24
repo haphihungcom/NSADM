@@ -5,6 +5,13 @@ class NSADMError(Exception):
     pass
 
 
+class ConfigError(NSADMError):
+    """NSADM general config error.
+    """
+
+    pass
+
+
 class LoaderError(NSADMError):
     """Loader plugin error.
     """

@@ -16,8 +16,6 @@ from nsadm import utils
 
 logger = logging.getLogger(__name__)
 
-RESERVED_PLACEHOLDER = "[reserved]"
-
 
 def get_category_number(category, subcategory):
     """Get category and subcategory number if they are descriptive name.

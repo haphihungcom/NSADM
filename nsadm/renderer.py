@@ -43,6 +43,9 @@ class TemplateRenderer():
         self.env = jinja2.Environment(loader=template_loader, trim_blocks=True, undefined=undef)
 
     def load_filters(self):
+        """Load all filters if filter path is set.
+        """
+
         if self.filter_path is not None:
             filters = utils.get_funcs(self.filter_path)
             if filters is None:
@@ -94,6 +97,8 @@ class DispatchRenderer():
 
     def load(self, dispatch_config):
         """Load template renderer filters, BBCode formatters, and setup context.
+        Args:
+            dispatch_config (dict): Dispatch config
         """
 
         self.template_renderer.load_filters()

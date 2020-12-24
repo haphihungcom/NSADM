@@ -9,25 +9,45 @@ logger = logging.getLogger(__name__)
 
 
 def load_vars_from_file(path):
+    """Load variables from a TOML file.
+
+    Args:
+        path (str): File path
+
+    Raises:
+        FileNotFoundError: [description]
+
+    Returns:
+        [type]: [description]
+    """
     try:
         vars = toml.load(path)
         logger.debug('Loaded vars file "%s"', path)
         return vars
     except FileNotFoundError:
-        raise FileNotFoundError('Vars file {} not found'.format(path))
+        logger.error('Could not find var file "{}"'.format(path))
 
 
 def get_all_vars(paths):
+    """Get variables from file(s).
+
+    Args:
+        paths (str|list): File path(s)
+
+    Returns:
+        dict: Variables
+    """
+
     vars = {}
 
     if isinstance(paths, list):
         if not paths:
-            logger.debug('No vars file found')
+            logger.debug('No var file found')
         else:
             for path in paths:
                 vars.update(load_vars_from_file(path))
     elif paths == '':
-        logger.debug('No vars file found')
+        logger.debug('No var file found')
     else:
         vars = load_vars_from_file(paths)
 

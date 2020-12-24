@@ -21,6 +21,13 @@ logger = logging.getLogger(__name__)
 
 
 class CredManager(collections.UserDict):
+    """Nation login credential manager object.
+
+    Args:
+        cred_loader: Credential loader
+        dispatch_api: Dispatch API
+    """
+
     def __init__(self, cred_loader, dispatch_api):
         self.cred_loader = cred_loader
         self.dispatch_api = dispatch_api
@@ -43,15 +50,39 @@ class CredManager(collections.UserDict):
         self.cred_loader.add_cred(nation_name, x_autologin)
 
     def __delitem__(self, nation_name):
+        """Delete a credential
+
+        Args:
+            nation_name (str): Nation name
+        """
+
         self.cred_loader.remove_cred(nation_name)
 
 
 def get_config_from_toml(config_path):
+    """Get config from a TOML file.
+
+    Args:
+        config_path (str): File path
+
+    Returns:
+        dict: Config
+    """
+
     with open(config_path) as f:
         return toml.load(f)
 
 
 def get_config():
+    """Get general config.
+
+    Raises:
+        exceptions.ConfigError: Could not find config file
+
+    Returns:
+        dict: Config
+    """
+
     config_path = os.getenv(info.CONFIG_ENVVAR)
     if config_path is not None:
         try:

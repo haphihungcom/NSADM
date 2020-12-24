@@ -25,7 +25,7 @@ def get_category_number(category, subcategory):
         subcategory (str): Subcategory
 
     Raises:
-        exceptions.DispatchUpdatingError: Raises if cannot find (sub)category number from name
+        exceptions.DispatchUpdatingError: Could not find (sub)category number from name
 
     Returns:
         str, str: Category and subcategory number
@@ -110,7 +110,7 @@ class DispatchUpdater():
             this_dispatch_config (dict): This dispatch's info
 
         Raises:
-            exceptions.DispatchUpdatingError: Raises when action is invalid
+            exceptions.DispatchUpdatingError: Action is invalid
         """
 
         category = this_dispatch_config['category']
@@ -171,5 +171,6 @@ class DispatchUpdater():
         Args:
             dispatch_id (str): Dispatch ID
         """
+
         self.dispatch_api.remove_dispatch(dispatch_id)
 

@@ -85,6 +85,17 @@ class IDStore(collections.UserDict):
 
 
 def define_action(name, config, id_dont_exist):
+    """Determine action to do on dispatch.
+
+    Args:
+        name (str): Dispatch name
+        config (dict): Dispatch config
+        id_dont_exist (bool): Dispatch doesn't have id
+
+    Returns:
+        str: Action
+    """
+
     # Use user-configured action if exists
     if 'action' in config:
         if config['action'] == 'remove' and id_dont_exist:
@@ -104,6 +115,16 @@ def define_action(name, config, id_dont_exist):
 
 
 def merge_with_id_store(dispatch_config, id_store):
+    """Add id and action into dispatch config.
+
+    Args:
+        dispatch_config (dict): Dispatch config
+        id_store: Dispatch id store
+
+    Returns:
+        dict: New dispatch config
+    """
+
     new_dispatch_config = {}
     for nation in dispatch_config.keys():
         new_dispatch_config[nation] = {}
@@ -139,41 +160,59 @@ def merge_with_id_store(dispatch_config, id_store):
 
 
 def load_dispatch_config(dispatch_config_path):
-        """Load dispatch configuration files.
+    """Load dispatch configuration files.
 
-        Args:
-            dispatch_config_path (str|list): Dispatch configuration path(s).
+    Args:
+        dispatch_config_path (str|list): Dispatch configuration path(s)
 
-        Returns:
-            dict: Dispatch configuration.
-        """
+    Returns:
+        dict: Dispatch configuration
+    """
 
-        if isinstance(dispatch_config_path, str):
-            dispatches = toml.load(dispatch_config_path)
-            logger.info('Loaded dispatch config: "%r"', dispatches)
-        elif isinstance(dispatch_config_path, list):
-            dispatches = {}
-            for dispatch_config in dispatch_config_path:
-                dispatches.update(toml.load(dispatch_config))
-                logger.debug('Loaded dispatch config: "%r"', dispatches)
-            logger.info('Loaded all dispatch config files')
-
-        return dispatches
+    if isinstance(dispatch_config_path, str):
+        dispatches = toml.load(dispatch_config_path)
+        logger.info('Loaded dispatch config: "%r"', dispatches)
+    elif isinstance(dispatch_config_path, list):
+        dispatches = {}
+        for dispatch_config in dispatch_config_path:
+            dispatches.update(toml.load(dispatch_config))
+            logger.debug('Loaded dispatch config: "%r"', dispatches)
+        logger.info('Loaded all dispatch config files')
+    return dispatches
 
 
 class FileDispatchLoader():
+    """Load dispatches from plain text files.
+
+    Args:
+        id_store: Dispatch id store
+        dispatch_config (dict): Dispatch config
+        file_ext (str): Dispatch file extension
+    """
     def __init__(self, id_store, dispatch_config, file_ext):
         self.id_store = id_store
         self.dispatch_config = dispatch_config
         self.file_ext = file_ext
 
     def get_dispatch_text(self, name):
+        """Get a dispatch's text content.
+
+        Args:
+            name (str): Dispatch name
+
+        Raises:
+            exceptions.LoaderError: Could not find dispatch file
+
+        Returns:
+            str: Text
+        """
+
         filename = '{}.{}'.format(name, self.file_ext)
         try:
             with open(filename) as f:
                 text = f.read()
         except FileNotFoundError:
-            logger.error('Dispatch template file "%s" not found.', filename)
+            logger.error('Could not found dispatch template file "%s".', filename)
             raise exceptions.LoaderError
 
         return text

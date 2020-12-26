@@ -1,4 +1,5 @@
 import os
+import shutil
 import json
 import toml
 import logging
@@ -6,6 +7,8 @@ from unittest import mock
 
 import pytest
 
+from nsadm import info
+from nsadm import exceptions
 from nsadm import utils
 
 
@@ -36,6 +39,7 @@ class TestCredManager():
         del creds['nation1']
 
         mock_cred_loader.remove_cred.assert_called_with('nation1')
+
 
 class TestGetDispatchInfo():
     def test_get_dispatch_info(self):
@@ -68,3 +72,42 @@ class TestGetDispatchInfo():
                                    'category': '1',
                                    'subcategory': '100',
                                    'owner_nation': 'nation2'}}
+
+
+class TestGetConfig():
+    @mock.patch('os.getenv')
+    def test_config_with_env(self, mock_getenv, toml_files):
+        toml_files({'test_config.toml': {'testkey': 'testval'}})
+        mock_getenv.return_value = 'test_config.toml'
+
+        r = utils.get_config()
+
+        assert r == {'testkey': 'testval'}
+
+    @mock.patch('os.getenv')
+    def test_config_with_env_and_non_existing_config_file(self, mock_getenv):
+        mock_getenv.return_value = 'test_config.toml'
+
+        with pytest.raises(exceptions.ConfigError):
+            utils.get_config()
+
+    @mock.patch('appdirs.user_config_dir')
+    def test_config_with_no_env_and_existing_config_file(self, mock_appdir, toml_files):
+        toml_files({info.CONFIG_NAME: {'testkey': 'testval'}})
+        mock_appdir.return_value = ''
+
+        r = utils.get_config()
+
+        assert r == {'testkey': 'testval'}
+
+    @mock.patch('appdirs.user_config_dir')
+    def test_config_with_no_env_and_non_existing_config_file(self, mock_appdir):
+        mock_appdir.return_value = 'test_folder'
+
+        with pytest.raises(exceptions.ConfigError):
+            utils.get_config()
+
+        config_path = os.path.join('test_folder', info.CONFIG_NAME)
+        assert os.path.isfile(config_path)
+
+        shutil.rmtree('test_folder')

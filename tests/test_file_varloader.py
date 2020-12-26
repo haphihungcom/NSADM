@@ -33,13 +33,16 @@ class TestFileVarLoader():
 
         assert r['foo1']['bar1'] == 'john1' and r['foo2']['bar2'] == 'john2'
 
-    def test_load_vars_with_non_existent_file(self):
-        with pytest.raises(FileNotFoundError):
-            file_varloader.get_all_vars('meguminbestgirl.toml')
+    def test_load_vars_with_non_existent_file(self, caplog):
+        file_varloader.get_all_vars('meguminbestgirl.toml')
 
-    def test_load_vars_with_non_existent_file_in_list(self, setup_vars_files):
-        with pytest.raises(FileNotFoundError):
-            file_varloader.get_all_vars(['meguminbestgirl.toml', 'test1.toml'])
+        assert caplog.records[-1].levelname == 'ERROR'
+
+    def test_load_vars_with_non_existent_file_in_list(self, setup_vars_files, caplog):
+        file_varloader.get_all_vars(['meguminbestgirl.toml', 'meguminworstgirl.toml', 'test1.toml'])
+
+        assert caplog.records[-1].levelname == 'ERROR'
+        assert caplog.records[-2].levelname == 'ERROR'
 
     def test_load_vars_with_empty_filename(self):
         """Load custom vars if no file is provided.

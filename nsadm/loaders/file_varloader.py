@@ -26,6 +26,7 @@ def load_vars_from_file(path):
         return vars
     except FileNotFoundError:
         logger.error('Could not find var file "{}"'.format(path))
+        return None
 
 
 def get_all_vars(paths):
@@ -38,20 +39,22 @@ def get_all_vars(paths):
         dict: Variables
     """
 
-    vars = {}
+    loaded_vars = {}
 
     if isinstance(paths, list):
         if not paths:
             logger.debug('No var file found')
         else:
             for path in paths:
-                vars.update(load_vars_from_file(path))
+                file_vars = load_vars_from_file(path)
+                if file_vars:
+                    loaded_vars.update(file_vars)
     elif paths == '':
         logger.debug('No var file found')
     else:
-        vars = load_vars_from_file(paths)
+        loaded_vars = load_vars_from_file(paths)
 
-    return vars
+    return loaded_vars
 
 
 @loader_api.var_loader

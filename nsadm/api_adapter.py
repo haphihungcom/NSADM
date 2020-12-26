@@ -83,7 +83,7 @@ class GeneralAPIAdapter():
 
 class DispatchAPI(GeneralAPIAdapter):
     def __init__(self, ns_api):
-        super(DispatchAPI, self).__init__(ns_api)
+        super().__init__(ns_api)
 
     def send_command(self, action, mode, **kwargs):
         """Send dispatch command.

@@ -52,9 +52,14 @@ class NSADM():
     def soft_load(self):
         self.cred_loader.load_loader()
 
-    def update_dispatches(self, dispatches=None):
-        for nation, dispatch_config in self.dispatch_config.items():
-            self.updater.login_owner_nation(nation, dispatch_config)
+    def update_dispatches_all_nations(self, dispatches=None):
+        for owner_nation, dispatch_config in self.dispatch_config.items():
+            try:
+                self.updater.login_owner_nation(owner_nation, dispatch_config)
+                logger.info('Logged in nation "%s".', owner_nation)
+            except exceptions.NationLoginError:
+                logger.error('Could not log into nation "%s".', owner_nation)
+                continue
 
             for name in dispatch_config.keys():
                 if dispatches is None or name in dispatches:
@@ -101,8 +106,9 @@ def main():
 
     try:
         config = utils.get_config()
-    except exceptions.ConfigError as e:
-        print(e)
+        logger.info('Loaded general config.')
+    except exceptions.ConfigError as err:
+        print(err)
         return
 
     try:
@@ -110,8 +116,8 @@ def main():
         app.soft_load()
         run(app, inputs)
         app.close()
-    except Exception as e:
-        logger.critical(e, exc_info=True)
+    except Exception as err:
+        logger.critical(err, exc_info=True)
 
 
 if __name__ == "__main__":

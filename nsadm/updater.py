@@ -3,15 +3,9 @@
 
 
 import logging
-import time
-import codecs
-
-import toml
 
 from nsadm import info
 from nsadm import exceptions
-from nsadm import renderer
-from nsadm import utils
 
 
 logger = logging.getLogger(__name__)
@@ -35,9 +29,13 @@ def get_category_number(category, subcategory):
         try:
             category_info = info.CATEGORIES[category]
             category_num = category_info['num']
+        except KeyError as err:
+            raise exceptions.NonexistentCategoryError('category', category) from err
+
+        try:
             subcategory_num = category_info['subcategories'][subcategory]
-        except KeyError:
-            raise exceptions.DispatchUpdatingError('Non-existent category or subcategory name')
+        except KeyError as err:
+            raise exceptions.NonexistentCategoryError('subcategory', subcategory) from err
     else:
         category_num = category
         subcategory_num = subcategory
@@ -83,11 +81,20 @@ class DispatchUpdater():
         this_dispatch_config = self.dispatch_config[name]
         action = this_dispatch_config.pop('action')
 
-        if action == 'remove':
-            dispatch_id = this_dispatch_config['ns_id']
-            self.remove_dispatch(dispatch_id)
-        else:
-            self.create_or_edit_dispatch(name, action, this_dispatch_config)
+        try:
+            if action == 'remove':
+                dispatch_id = this_dispatch_config['ns_id']
+                logger.debug('Remove dispatch "%s" with id "%s".')
+                self.remove_dispatch(dispatch_id)
+                logger.info('Removed dispatch "%s".')
+            elif action in ('edit', 'create'):
+                self.create_or_edit_dispatch(name, action, this_dispatch_config)
+            else:
+                logger.error('Invalid action "%s" on dispatch "%s".', action, name)
+        except exceptions.UnknownDispatchError:
+            logger.error('Could not find dispatch "%s" with id "%s".', name, dispatch_id)
+        except exceptions.NotOwnerDispatchError:
+            logger.error('Dispatch "%s" is not owned by this nation.', name)
 
     def get_dispatch_text(self, name):
         """Get rendered text for a dispatch.
@@ -108,15 +115,21 @@ class DispatchUpdater():
             name (str): Dispatch name
             action (str): Action to perform
             this_dispatch_config (dict): This dispatch's info
-
-        Raises:
-            exceptions.DispatchUpdatingError: Action is invalid
         """
 
-        category = this_dispatch_config['category']
-        subcategory = this_dispatch_config['subcategory']
-        category_num, subcategory_num = get_category_number(category, subcategory)
-        title = this_dispatch_config['title']
+        try:
+            category = this_dispatch_config['category']
+            subcategory = this_dispatch_config['subcategory']
+            title = this_dispatch_config['title']
+        except KeyError as err:
+            logger.error('Dispatch "%s" does not have %s.', name, err)
+            return
+
+        try:
+            category_num, subcategory_num = get_category_number(category, subcategory)
+        except exceptions.NonexistentCategoryError as err:
+            logger.error('Text %s "%s" of dispatch "%s" not found.', err.type, err.value, name)
+            return
 
         try:
             text = self.get_dispatch_text(name)
@@ -130,12 +143,15 @@ class DispatchUpdater():
                   'subcategory': subcategory_num}
 
         if action == 'create':
+            logger.debug('Create dispatch "%s" with params: %r', name, params)
             self.create_dispatch(name, params)
+            logger.info('Created dispatch "%s".')
         elif action == 'edit':
             dispatch_id = this_dispatch_config['ns_id']
+            logger.debug('Edit dispatch "%s" with id "%s" and with params: %r',
+                         name, dispatch_id, params)
             self.edit_dispatch(dispatch_id, params)
-        else:
-            raise exceptions.DispatchUpdatingError('Invalid action "{}" on dispatch "{}".', action, name)
+            logger.info('Edited dispatch "%s".')
 
     def create_dispatch(self, name, params):
         """Create a dispatch.
@@ -149,6 +165,7 @@ class DispatchUpdater():
                                                             text=params['text'],
                                                             category=params['category'],
                                                             subcategory=params['subcategory'])
+        logger.debug('Got id "%s" of new dispatch "%s".', new_dispatch_id, name)
         self.dispatch_loader.add_dispatch_id(name, new_dispatch_id)
 
     def edit_dispatch(self, dispatch_id, params):
@@ -173,4 +190,3 @@ class DispatchUpdater():
         """
 
         self.dispatch_api.remove_dispatch(dispatch_id)
-

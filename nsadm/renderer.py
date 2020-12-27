@@ -49,7 +49,7 @@ class TemplateRenderer():
         if self.filter_path is not None:
             filters = utils.get_funcs(self.filter_path)
             if filters is None:
-                logger.warning('Filter file not found!')
+                logger.info('Filter file not found!')
             else:
                 loaded_filters = {}
                 for filter in filters:

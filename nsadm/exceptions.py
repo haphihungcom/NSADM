@@ -1,54 +1,67 @@
+"""Exceptions for NSADM-specific errors.
+"""
+
+
 class NSADMError(Exception):
     """NSADM general error.
     """
-
-    pass
 
 
 class ConfigError(NSADMError):
     """NSADM general config error.
     """
 
-    pass
-
 
 class LoaderError(NSADMError):
     """Loader plugin error.
     """
-
-    pass
 
 
 class DispatchAPIError(NSADMError):
     """Dispatch API error.
     """
 
-    pass
+
+class UnknownDispatchError(DispatchAPIError):
+    """This dispatch does not exist.
+    """
+
+
+class NotOwnerDispatchError(DispatchAPIError):
+    """You do not own this dispatch.
+    """
+
+
+class NationLoginError(DispatchAPIError):
+    """Failed to log in to nation.
+    """
 
 
 class DispatchUpdatingError(NSADMError):
     """Dispatch update error.
     """
 
-    pass
+
+class NonexistentCategoryError(DispatchUpdatingError):
+    """Category or subcategory doesn't exist.
+    """
+
+    def __init__(self, type, value):
+        self.type = type
+        self.value = value
+        super().__init__()
 
 
 class DispatchRenderingError(NSADMError):
     """Dispatch rendering error.
     """
 
-    pass
-
 
 class BBParsingError(DispatchRenderingError):
     """BBCode parsing errors.
     """
 
-    pass
-
 
 class TemplateRendererError(DispatchRenderingError):
     """Jinja template rendering errors.
     """
-
-    pass

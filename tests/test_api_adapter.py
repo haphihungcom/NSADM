@@ -7,13 +7,6 @@ from nsadm import api_adapter
 from nsadm import exceptions
 
 
-def mock_ns_response(*args, **kwargs):
-    if kwargs['mode'] == 'prepare':
-        return {'success': '1234abcd'}
-    elif kwargs['mode'] == 'execute' and kwargs['token'] == '1234abcd':
-        return {'success': 'New factbook posted! <a href="/nation=test/detail=factbook/id=1234567">View Your Factbook</a>'}
-
-
 class TestDispatchAPI():
     def test_login_with_password_and_get_autologin(self):
         response = {'headers': {'X-Autologin': '123456'}}
@@ -43,41 +36,33 @@ class TestDispatchAPI():
         with pytest.raises(exceptions.DispatchAPIError):
             dispatch_api.login('my_nation', 'hunterprime123')
 
-    def test_prepare_command_success(self):
-        mock_nation = mock.Mock(command=mock.Mock(return_value={'success': '1234abcd'}))
-        dispatch_api = api_adapter.DispatchAPI(mock.Mock())
-        dispatch_api.owner_nation = mock_nation
-
-        token = dispatch_api.prepare_command('remove', dispatch_id='12345')
-
-        assert token == '1234abcd'
-
-    def test_prepare_command_error(self):
-        mock_nation = mock.Mock(command=mock.Mock(return_value={'error': 'error message'}))
-        dispatch_api = api_adapter.DispatchAPI(mock.Mock())
-        dispatch_api.owner_nation = mock_nation
-
-        with pytest.raises(exceptions.DispatchAPIError):
-            dispatch_api.prepare_command('remove', dispatch_id='12345')
-
-    def test_execute_command(self):
-        mock_nation = mock.Mock(command=mock.Mock(side_effect=mock_ns_response))
-        dispatch_api = api_adapter.DispatchAPI(mock.Mock())
-        dispatch_api.owner_nation = mock_nation
-
-        dispatch_api.execute_command('create', title='test', text='hello world',
-                                     category='1', subcategory='100')
-
-        mock_nation.command.assert_called_with('dispatch', dispatch='create', mode='execute', dispatchid=None,
-                                               title='test', text='hello world', category='1', subcategory='100',
-                                               token='1234abcd')
-
     def test_create_dispatch(self):
         resp = 'New factbook posted! <a href="/nation=test/detail=factbook/id=1234567">View Your Factbook</a>'
         dispatch_api = api_adapter.DispatchAPI(mock.Mock())
-        dispatch_api.execute_command = mock.Mock(return_value={'success': resp})
+        dispatch_api.owner_nation = mock.Mock(create_dispatch=mock.Mock(return_value={'success': resp}))
 
         r = dispatch_api.create_dispatch(title='test', text='hello world',
                                          category='1', subcategory='100')
 
         assert r == '1234567'
+
+    def test_edit_dispatch(self):
+        resp = 'New factbook edited! <a href="/nation=test/detail=factbook/id=1234567">View Your Factbook</a>'
+        dispatch_api = api_adapter.DispatchAPI(mock.Mock())
+        dispatch_api.owner_nation = mock.Mock(edit_dispatch=mock.Mock(return_value={'success': resp}))
+
+        dispatch_api.edit_dispatch(dispatch_id='1234567', title='test', text='hello world',
+                                   category='1', subcategory='100')
+
+        assert True
+
+    def test_remove_dispatch(self):
+        resp = 'Remove dispatch "test."'
+        dispatch_api = api_adapter.DispatchAPI(mock.Mock())
+        dispatch_api.owner_nation = mock.Mock(remove_dispatch=mock.Mock(return_value={'success': resp}))
+
+        dispatch_api.remove_dispatch(dispatch_id='1234567')
+
+        assert True
+
+

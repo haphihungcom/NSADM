@@ -134,7 +134,6 @@ class DispatchUpdater():
         try:
             text = self.get_dispatch_text(name)
         except exceptions.LoaderError:
-            logger.error('Failed to get text content of dispatch "%s".', name)
             return
 
         params = {'title': title,

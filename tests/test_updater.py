@@ -104,8 +104,6 @@ class TestDispatchUpdater():
 
         ins.create_or_edit_dispatch('test_name', 'edit', this_dispatch_config)
 
-        assert caplog.records[-1].levelname == 'ERROR'
-
     def test_update_dispatch_with_remove_action(self):
         mock_obj = mock.Mock()
         ins = updater.DispatchUpdater(mock_obj, mock_obj, mock_obj, mock_obj)

@@ -98,6 +98,8 @@ class DispatchUpdater():
             logger.error('Could not find dispatch "%s" with id "%s".', name, dispatch_id)
         except exceptions.NotOwnerDispatchError:
             logger.error('Dispatch "%s" is not owned by this nation.', name)
+        except exceptions.DispatchAPIError:
+            logger.exception('Dispatch API error')
 
     def get_dispatch_text(self, name):
         """Get rendered text for a dispatch.

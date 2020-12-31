@@ -7,6 +7,18 @@ from nsadm import api_adapter
 from nsadm import exceptions
 
 
+class TestReraiseException():
+    def test_unknown_dispatch(self):
+        exception = nationstates.exceptions.APIUsageError('Unknown dispatch.')
+        with pytest.raises(exceptions.UnknownDispatchError):
+            api_adapter.reraise_exception(exception)
+
+    def test_not_owner_dispatch(self):
+        exception = nationstates.exceptions.APIUsageError('You are not the author of this dispatch.')
+        with pytest.raises(exceptions.NotOwnerDispatchError):
+            api_adapter.reraise_exception(exception)
+
+
 class TestDispatchAPI():
     def test_login_with_password_and_get_autologin(self):
         response = {'headers': {'X-Autologin': '123456'}}

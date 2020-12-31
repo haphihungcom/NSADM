@@ -2,14 +2,31 @@
 """
 
 import re
-import logging
 
 import nationstates
 
 from nsadm import exceptions
 
 
+def reraise_exception(err):
+    """Reraise appropriate exceptions.
+    """
+
+    if 'Unknown dispatch' in str(err):
+        raise exceptions.UnknownDispatchError from err
+    if 'not the author of this dispatch' in str(err):
+        raise exceptions.NotOwnerDispatchError from err
+
+    raise exceptions.DispatchAPIError from err
+
+
 class DispatchAPI():
+    """pynationstates wrapper for dispatch functions.
+
+    Args:
+        ns_api (nationstates.Nationstates): Real API object
+    """
+
     def __init__(self, ns_api):
         self.api = ns_api
         self.owner_nation = None
@@ -22,7 +39,7 @@ class DispatchAPI():
             password (str): Nation password
 
         Returns:
-            str: X-Autologin
+            str or None: X-Autologin or None if doesn't login via password
         """
 
         if autologin is None:
@@ -36,10 +53,12 @@ class DispatchAPI():
             raise exceptions.NationLoginError from err
 
         if password is not None:
-            if 'X-Autologin' in resp_headers:
-                return resp_headers['X-Autologin']
-            else:
+            if 'X-Autologin' not in resp_headers:
                 raise exceptions.NationLoginError
+
+            return resp_headers['X-Autologin']
+
+        return None
 
     def create_dispatch(self, title, text, category, subcategory):
         """Create a dispatch.
@@ -53,12 +72,12 @@ class DispatchAPI():
             str: New dispatch ID
         """
 
-        r = self.owner_nation.create_dispatch(title=title,
-                                              text=text,
-                                              category=category,
-                                              subcategory=subcategory)
+        resp = self.owner_nation.create_dispatch(title=title,
+                                                 text=text,
+                                                 category=category,
+                                                 subcategory=subcategory)
 
-        new_dispatch_id = re.search('id=(\\d+)', r['success']).group(1)
+        new_dispatch_id = re.search('id=(\\d+)', resp['success']).group(1)
         return new_dispatch_id
 
     def edit_dispatch(self, dispatch_id, title, text, category, subcategory):
@@ -79,10 +98,7 @@ class DispatchAPI():
                                             category=category,
                                             subcategory=subcategory)
         except nationstates.exceptions.APIUsageError as err:
-            if 'Unknown dispatch' in str(err):
-                raise exceptions.UnknownDispatchError from err
-            elif 'not the author of this dispatch' in str(err):
-                raise exceptions.NotOwnerDispatchError from err
+            reraise_exception(err)
 
     def remove_dispatch(self, dispatch_id):
         """Delete a dispatch.
@@ -91,6 +107,7 @@ class DispatchAPI():
             dispatch_id (str): Dispatch ID
         """
 
-        r = self.owner_nation.remove_dispatch(dispatchid=dispatch_id)
-        if not r:
-            raise exceptions.DispatchAPIError
+        try:
+            self.owner_nation.remove_dispatch(dispatch_id=dispatch_id)
+        except nationstates.exceptions.APIUsageError as err:
+            reraise_exception(err)

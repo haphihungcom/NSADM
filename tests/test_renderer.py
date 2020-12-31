@@ -6,6 +6,7 @@ from unittest import mock
 import pytest
 import toml
 
+from nsadm import exceptions
 from nsadm import renderer
 
 
@@ -15,6 +16,23 @@ def get_mock_dispatch_loader():
         return mock.Mock(get_dispatch_text=mock.Mock(return_value=text))
 
     return dispatch_loader
+
+
+class TestDispatchTemplateLoader():
+    def test_load_text(self):
+        get_dispatch_text = mock.Mock(return_value='Test text')
+        loader_plugin = mock.Mock(get_dispatch_text=get_dispatch_text)
+        loader = renderer.DispatchJinjaLoader(loader_plugin)
+
+        assert loader.get_source(mock.Mock(), 'Test') == ('Test text', 'Test', True)
+
+    def test_load_text_with_loader_error(self):
+        get_dispatch_text = mock.Mock(side_effect=exceptions.LoaderError(suppress_nsadm_error=False))
+        loader_plugin = mock.Mock(get_dispatch_text=get_dispatch_text)
+        loader = renderer.DispatchJinjaLoader(loader_plugin)
+
+        with pytest.raises(exceptions.DispatchRenderingError):
+            loader.get_source(mock.Mock(), 'Test')
 
 
 class TestTemplateRenderer():

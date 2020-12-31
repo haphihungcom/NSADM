@@ -79,7 +79,10 @@ class DispatchUpdater():
         """
 
         this_dispatch_config = self.dispatch_config[name]
-        action = this_dispatch_config.pop('action')
+        try:
+            action = this_dispatch_config.pop('action')
+        except KeyError as err:
+            logger.error('Dispatch "%s" does not have %s.', name, err)
 
         try:
             if action == 'remove':
@@ -133,7 +136,7 @@ class DispatchUpdater():
 
         try:
             text = self.get_dispatch_text(name)
-        except exceptions.LoaderError:
+        except exceptions.DispatchRenderingError as err:
             return
 
         params = {'title': title,

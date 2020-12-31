@@ -16,6 +16,10 @@ class LoaderError(NSADMError):
     """Loader plugin error.
     """
 
+    def __init__(self, suppress_nsadm_error=True):
+        self.suppress_nsadm_error = suppress_nsadm_error
+        super().__init__()
+
 
 class DispatchAPIError(NSADMError):
     """Dispatch API error.

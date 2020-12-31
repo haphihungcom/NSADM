@@ -15,7 +15,7 @@ from nsadm import utils
 logger = logging.getLogger(__name__)
 
 
-class DispatchTemplateLoader(jinja2.BaseLoader):
+class DispatchJinjaLoader(jinja2.BaseLoader):
     """Wrapper around dispatch loader for Jinja environment.
     """
 
@@ -23,7 +23,13 @@ class DispatchTemplateLoader(jinja2.BaseLoader):
         self.dispatch_loader = dispatch_loader
 
     def get_source(self, environment, template):
-        text = self.dispatch_loader.get_dispatch_text(template)
+        try:
+            text = self.dispatch_loader.get_dispatch_text(template)
+        except exceptions.LoaderError as err:
+            if not err.suppress_nsadm_error:
+                logger.error('Text %s "%s" of dispatch "%s" not found.')
+            raise exceptions.DispatchRenderingError from err
+
         return text, template, True
 
 
@@ -37,7 +43,7 @@ class TemplateRenderer():
 
     def __init__(self, dispatch_loader, filter_path):
         self.filter_path = filter_path
-        template_loader = DispatchTemplateLoader(dispatch_loader)
+        template_loader = DispatchJinjaLoader(dispatch_loader)
         # Make access to undefined context variables generate logs.
         undef = jinja2.make_logging_undefined(logger=logger)
         self.env = jinja2.Environment(loader=template_loader, trim_blocks=True, undefined=undef)

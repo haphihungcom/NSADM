@@ -1,7 +1,7 @@
 import os
 import json
 import toml
-import logging
+import shutil
 from unittest import mock
 
 import pytest
@@ -296,18 +296,29 @@ class TestMergeIDStore():
         assert 'nation1' not in r
 
 
-class TestFileDispatchLoaderObj():
-    def test_get_dispatch_text(self, text_files):
-        text_files({'test1.txt': 'Test text 1', 'test2.txt': 'Test text 2'})
+@pytest.fixture(scope='module')
+def setup_folder():
+    os.mkdir('test_templates')
 
-        obj = file_dispatchloader.FileDispatchLoader({}, {}, 'txt')
+    yield
+
+    shutil.rmtree('test_templates')
+
+
+class TestFileDispatchLoaderObj():
+
+    def test_get_dispatch_text(self, text_files, setup_folder):
+        text_files({'test_templates/test1.txt': 'Test text 1',
+                    'test_templates/test2.txt': 'Test text 2'})
+
+        obj = file_dispatchloader.FileDispatchLoader({}, {}, 'test_templates', 'txt')
 
         assert obj.get_dispatch_text('test1') == 'Test text 1'
 
     def test_get_dispatch_text_with_non_existing_file(self, text_files):
         text_files({'test1.txt': 'Test text 1'})
 
-        obj = file_dispatchloader.FileDispatchLoader({}, {}, 'txt')
+        obj = file_dispatchloader.FileDispatchLoader({}, {}, 'test_templates', 'txt')
 
         with pytest.raises(exceptions.LoaderError):
             obj.get_dispatch_text('test2')
@@ -315,9 +326,9 @@ class TestFileDispatchLoaderObj():
 
 class TestFileDispatchLoader():
     @pytest.fixture
-    def setup_text_files(self, text_files):
-        text_files({'test1.txt': 'Test text 1', 'test2.txt': 'Test text 2',
-                    'text3.txt': 'Test text 3'})
+    def setup_text_files(self, text_files, setup_folder):
+        text_files({'test_templates/test1.txt': 'Test text 1', 'test_templates/test2.txt': 'Test text 2',
+                    'test_templates/text3.txt': 'Test text 3'})
 
     def test_integration_with_non_existing_id_store_with_save_config_defined_id_true(self,
                                                                                      toml_files,
@@ -337,6 +348,7 @@ class TestFileDispatchLoader():
         toml_files({'test_config.toml': dispatch_config})
         config = {'file_dispatchloader': {'id_store_path': 'id_store_test.json',
                                           'dispatch_config_paths': 'test_config.toml',
+                                          'template_path': 'test_templates',
                                           'file_ext': 'txt',
                                           'save_config_defined_id': True}}
         loader = file_dispatchloader.init_loader(config)
@@ -381,6 +393,7 @@ class TestFileDispatchLoader():
         json_files({'id_store_test.json' :{'test1': '1234567', 'test4': '456789'}})
         config = {'file_dispatchloader': {'id_store_path': 'id_store_test.json',
                                           'dispatch_config_paths': 'test_config.toml',
+                                          'template_path': 'test_templates',
                                           'file_ext': 'txt',
                                           'save_config_defined_id': True}}
         loader = file_dispatchloader.init_loader(config)
@@ -424,6 +437,7 @@ class TestFileDispatchLoader():
         json_files({'id_store_test.json': {'test1': '1234567', 'test4': '456789'}})
         config = {'file_dispatchloader': {'id_store_path': 'id_store_test.json',
                                           'dispatch_config_paths': 'test_config.toml',
+                                          'template_path': 'test_templates',
                                           'file_ext': 'txt',
                                           'save_config_defined_id': False}}
         loader = file_dispatchloader.init_loader(config)

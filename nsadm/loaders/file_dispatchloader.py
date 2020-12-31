@@ -1,3 +1,4 @@
+import os
 import collections
 import copy
 import json
@@ -189,9 +190,10 @@ class FileDispatchLoader():
         dispatch_config (dict): Dispatch config
         file_ext (str): Dispatch file extension
     """
-    def __init__(self, id_store, dispatch_config, file_ext):
+    def __init__(self, id_store, dispatch_config, template_path, file_ext):
         self.id_store = id_store
         self.dispatch_config = dispatch_config
+        self.template_path = template_path
         self.file_ext = file_ext
 
     def get_dispatch_text(self, name):
@@ -208,11 +210,12 @@ class FileDispatchLoader():
         """
 
         filename = '{}.{}'.format(name, self.file_ext)
+        file_path = os.path.join(self.template_path, filename)
         try:
-            with open(filename) as f:
+            with open(file_path) as f:
                 text = f.read()
         except FileNotFoundError:
-            logger.error('Could not found dispatch template file "%s".', filename)
+            logger.error('Could not found dispatch template file "%s".', file_path)
             raise exceptions.LoaderError
 
         return text
@@ -240,7 +243,9 @@ def init_loader(config):
     if this_config['save_config_defined_id']:
         id_store.load_from_dispatch_config(dispatch_config)
 
-    loader = FileDispatchLoader(id_store, dispatch_config, this_config['file_ext'])
+    loader = FileDispatchLoader(id_store, dispatch_config,
+                                this_config['template_path'],
+                                this_config['file_ext'])
 
     return loader
 

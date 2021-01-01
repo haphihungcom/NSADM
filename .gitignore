@@ -5,5 +5,4 @@
 __pycache__/
 templates/
 nsadm/config/
-virtualenv/
 nsadm/templates/

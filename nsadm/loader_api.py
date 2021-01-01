@@ -1,3 +1,6 @@
+"""API for loaders.
+"""
+
 import pluggy
 
 from nsadm import info
@@ -14,7 +17,7 @@ cred_loader = pluggy.HookimplMarker(info.CRED_LOADER_PROJ)
 
 
 @dispatch_loader_specs(firstresult=True)
-def init_loader(config):
+def init_dispatch_loader(config):
     """Initiate a loader.
 
     Args:
@@ -23,8 +26,6 @@ def init_loader(config):
     Return:
         Loader object
     """
-
-    pass
 
 
 @dispatch_loader_specs(firstresult=True)
@@ -37,7 +38,6 @@ def get_dispatch_config(loader):
     Return:
         dict: Dispatch configuration
     """
-    pass
 
 
 @dispatch_loader_specs(firstresult=True)
@@ -51,8 +51,6 @@ def get_dispatch_text(loader, name):
         str: Dispatch content text
     """
 
-    pass
-
 
 @dispatch_loader_specs(firstresult=True)
 def add_dispatch_id(loader, name, dispatch_id):
@@ -64,18 +62,14 @@ def add_dispatch_id(loader, name, dispatch_id):
         dispatch_id (str): Dispatch ID
     """
 
-    pass
-
 
 @dispatch_loader_specs(firstresult=True)
-def cleanup_loader(loader):
+def cleanup_dispatch_loader(loader):
     """Cleanup loader and close it.
 
     Args:
         loader: Loader
     """
-
-    pass
 
 
 @var_loader_specs
@@ -89,11 +83,21 @@ def get_vars(config):
         dict: Variables
     """
 
-    pass
+
+@cred_loader_specs(firstresult=True)
+def init_cred_loader(config):
+    """Initiate a loader.
+
+    Args:
+        config (dict): Loaders' configuration
+
+    Return:
+        Loader object
+    """
 
 
 @cred_loader_specs(firstresult=True)
-def get_creds(config):
+def get_creds(loader):
     """Get all nations' credential.
 
     Args:
@@ -103,11 +107,9 @@ def get_creds(config):
         dict: Nations' credential
     """
 
-    pass
-
 
 @cred_loader_specs(firstresult=True)
-def add_cred(config, name, x_autologin):
+def add_cred(loader, name, x_autologin):
     """Add a nation's credential.
 
     Args:
@@ -116,11 +118,9 @@ def add_cred(config, name, x_autologin):
         x_autologin (str): Nation's X-Autologin.
     """
 
-    pass
-
 
 @cred_loader_specs(firstresult=True)
-def remove_cred(config, name):
+def remove_cred(loader, name):
     """Delete a nation's credential.
 
     Args:
@@ -128,4 +128,11 @@ def remove_cred(config, name):
         name (str): Nation name
     """
 
-    pass
+
+@cred_loader_specs(firstresult=True)
+def cleanup_cred_loader(loader):
+    """Cleanup loader and close it.
+
+    Args:
+        loader: Loader
+    """

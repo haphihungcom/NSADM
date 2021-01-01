@@ -61,6 +61,7 @@ class TestCredLoader():
         obj = loader.CredLoader(CRED_LOADER_NAME, CRED_LOADER_CONFIG)
         obj.load_loader()
         r = obj.get_creds()
+        obj.cleanup_loader()
 
         assert r == {'nation1': '123456'}
 
@@ -68,6 +69,7 @@ class TestCredLoader():
         obj = loader.CredLoader(CRED_LOADER_NAME, CRED_LOADER_CONFIG)
         obj.load_loader()
         r = obj.add_cred('nation1', '123456')
+        obj.cleanup_loader()
 
         assert r
 
@@ -75,5 +77,6 @@ class TestCredLoader():
         obj = loader.CredLoader(CRED_LOADER_NAME, CRED_LOADER_CONFIG)
         obj.load_loader()
         r = obj.remove_cred('nation1')
+        obj.cleanup_loader()
 
         assert r

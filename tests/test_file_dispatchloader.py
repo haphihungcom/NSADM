@@ -351,13 +351,13 @@ class TestFileDispatchLoader():
                                           'template_path': 'test_templates',
                                           'file_ext': 'txt',
                                           'save_config_defined_id': True}}
-        loader = file_dispatchloader.init_loader(config)
+        loader = file_dispatchloader.init_dispatch_loader(config)
 
         r_config = file_dispatchloader.get_dispatch_config(loader)
         r_text = file_dispatchloader.get_dispatch_text(loader, 'test1')
         file_dispatchloader.add_dispatch_id(loader, 'test1', '1234567')
 
-        file_dispatchloader.cleanup_loader(loader)
+        file_dispatchloader.cleanup_dispatch_loader(loader)
 
         with open('id_store_test.json') as f:
             r_id_store = json.load(f)
@@ -396,13 +396,13 @@ class TestFileDispatchLoader():
                                           'template_path': 'test_templates',
                                           'file_ext': 'txt',
                                           'save_config_defined_id': True}}
-        loader = file_dispatchloader.init_loader(config)
+        loader = file_dispatchloader.init_dispatch_loader(config)
 
         r_config = file_dispatchloader.get_dispatch_config(loader)
         r_text = file_dispatchloader.get_dispatch_text(loader, 'test2')
         file_dispatchloader.add_dispatch_id(loader, 'test3', '3456789')
 
-        file_dispatchloader.cleanup_loader(loader)
+        file_dispatchloader.cleanup_dispatch_loader(loader)
 
         with open('id_store_test.json') as f:
             r_id_store = json.load(f)
@@ -440,13 +440,13 @@ class TestFileDispatchLoader():
                                           'template_path': 'test_templates',
                                           'file_ext': 'txt',
                                           'save_config_defined_id': False}}
-        loader = file_dispatchloader.init_loader(config)
+        loader = file_dispatchloader.init_dispatch_loader(config)
 
         r_config = file_dispatchloader.get_dispatch_config(loader)
         r_text = file_dispatchloader.get_dispatch_text(loader, 'test2')
         file_dispatchloader.add_dispatch_id(loader, 'test3', '3456789')
 
-        file_dispatchloader.cleanup_loader(loader)
+        file_dispatchloader.cleanup_dispatch_loader(loader)
 
         with open('id_store_test.json') as f:
             r_id_store = json.load(f)

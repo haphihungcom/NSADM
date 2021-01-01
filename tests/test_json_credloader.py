@@ -28,13 +28,17 @@ def only_clean_creds():
 class TestJSONLoader():
     def test_get_creds(self, mock_creds_setup):
         config = {'json_credloader': {'cred_path': 'test.json'}}
-        r = json_credloader.get_creds(config)
+        loader = json_credloader.init_cred_loader(config)
+
+        r = json_credloader.get_creds(loader)
 
         assert r['nation2'] == 'hunterprime2'
 
     def test_add_cred_with_existing_file(self, mock_creds_setup):
         config = {'json_credloader': {'cred_path': 'test.json'}}
-        json_credloader.add_cred(config, 'nation3', 'hunterprime3')
+        loader = json_credloader.init_cred_loader(config)
+
+        json_credloader.add_cred(loader, 'nation3', 'hunterprime3')
 
         with open('test.json') as f:
             r = json.load(f)
@@ -43,7 +47,9 @@ class TestJSONLoader():
 
     def test_add_cred_with_non_existing_file(self, only_clean_creds):
         config = {'json_credloader': {'cred_path': 'test.json'}}
-        json_credloader.add_cred(config, 'nation1', 'hunterprime1')
+        loader = json_credloader.init_cred_loader(config)
+
+        json_credloader.add_cred(loader, 'nation1', 'hunterprime1')
 
         with open('test.json') as f:
             r = json.load(f)
@@ -52,7 +58,9 @@ class TestJSONLoader():
 
     def test_remove_cred(self, mock_creds_setup):
         config = {'json_credloader': {'cred_path': 'test.json'}}
-        json_credloader.remove_cred(config, 'nation2')
+        loader = json_credloader.init_cred_loader(config)
+
+        json_credloader.remove_cred(loader, 'nation2')
 
         with open('test.json') as f:
             r = json.load(f)

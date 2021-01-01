@@ -23,7 +23,7 @@ class DispatchLoaderTest1():
 
 
 @loader_api.dispatch_loader
-def init_loader(config):
+def init_dispatch_loader(config):
     return DispatchLoaderTest1(config['dispatchloader-test1'])
 
 
@@ -44,5 +44,5 @@ def add_dispatch_id(loader, name, dispatch_id):
 
 
 @loader_api.dispatch_loader
-def cleanup_loader(loader):
+def cleanup_dispatch_loader(loader):
     return loader.cleanup_loader()

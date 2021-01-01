@@ -1,4 +1,4 @@
-"""Loads and runs plugins
+"""Load and run plugins.
 """
 
 import collections
@@ -48,17 +48,15 @@ class Loader():
             self.load_a_loader(self.name)
 
 
-# pylint: disable=maybe-no-member
-class DispatchLoader(Loader):
-    """Load dispatch information and content.
+class PersistentLoader(Loader):
+    """Handling plugins that need to exist for the entire duration of the app.
 
     Args:
-        name (str): Name of loader file
+        Same as Loader class
     """
 
-    def __init__(self, name, loader_config):
-        super(DispatchLoader, self).__init__(info.DISPATCH_LOADER_PROJ,
-                                             name, loader_config)
+    def __init__(self, proj_name, name, loader_config):
+        super().__init__(proj_name, name, loader_config)
         # Loader instance to reuse the same database connection
         # across hook calls.
         self._loader = None
@@ -68,22 +66,17 @@ class DispatchLoader(Loader):
         reusing file handlers/database connections.
         """
 
-        super(DispatchLoader, self).load_loader()
-        self._loader = self.manager.hook.init_loader(config=self.loader_config)
+        super().load_loader()
+        self.init_loader()
 
-    def get_dispatch_config(self):
-        return self.manager.hook.get_dispatch_config(loader=self._loader)
-
-    def get_dispatch_text(self, name):
-        return self.manager.hook.get_dispatch_text(loader=self._loader, name=name)
-
-    def add_dispatch_id(self, name, id):
-        return self.manager.hook.add_dispatch_id(loader=self._loader, name=name, dispatch_id=id)
+    def init_loader(self):
+        raise NotImplementedError
 
     def cleanup_loader(self):
-        self.manager.hook.cleanup_loader(loader=self._loader)
+        raise NotImplementedError
 
 
+# pylint: disable=maybe-no-member
 class VarLoader(Loader):
     """Load variables from multiple loaders.
 
@@ -92,8 +85,7 @@ class VarLoader(Loader):
     """
 
     def __init__(self, names, loader_config):
-        super(VarLoader, self).__init__(info.VAR_LOADER_PROJ,
-                                        names, loader_config)
+        super().__init__(info.VAR_LOADER_PROJ, names, loader_config)
 
     def get_all_vars(self):
         vars_list = self.manager.hook.get_vars(config=self.loader_config)
@@ -101,7 +93,33 @@ class VarLoader(Loader):
         return merged_vars_dict
 
 
-class CredLoader(Loader):
+class DispatchLoader(PersistentLoader):
+    """Load dispatch information and content.
+
+    Args:
+        name (str): Name of loader file
+    """
+
+    def __init__(self, name, loader_config):
+        super().__init__(info.DISPATCH_LOADER_PROJ, name, loader_config)
+
+    def init_loader(self):
+        self._loader = self.manager.hook.init_dispatch_loader(config=self.loader_config)
+
+    def cleanup_loader(self):
+        self.manager.hook.cleanup_dispatch_loader(loader=self._loader)
+
+    def get_dispatch_config(self):
+        return self.manager.hook.get_dispatch_config(loader=self._loader)
+
+    def get_dispatch_text(self, name):
+        return self.manager.hook.get_dispatch_text(loader=self._loader, name=name)
+
+    def add_dispatch_id(self, name, dispatch_id):
+        return self.manager.hook.add_dispatch_id(loader=self._loader, name=name, dispatch_id=dispatch_id)
+
+
+class CredLoader(PersistentLoader):
     """Load nation login credentials.
 
     Args:
@@ -109,15 +127,20 @@ class CredLoader(Loader):
     """
 
     def __init__(self, name, loader_config):
-        super(CredLoader, self).__init__(info.CRED_LOADER_PROJ,
-                                         name, loader_config)
+        super().__init__(info.CRED_LOADER_PROJ, name, loader_config)
+
+    def init_loader(self):
+        self._loader = self.manager.hook.init_cred_loader(config=self.loader_config)
+
+    def cleanup_loader(self):
+        self.manager.hook.cleanup_cred_loader(loader=self._loader)
 
     def get_creds(self):
-        return self.manager.hook.get_creds(config=self.loader_config)
+        return self.manager.hook.get_creds(loader=self._loader)
 
     def add_cred(self, name, x_autologin):
-        return self.manager.hook.add_cred(config=self.loader_config,
-                                             name=name, x_autologin=x_autologin)
+        return self.manager.hook.add_cred(loader=self._loader,
+                                          name=name, x_autologin=x_autologin)
 
     def remove_cred(self, name):
-        return self.manager.hook.remove_cred(config=self.loader_config, name=name)
+        return self.manager.hook.remove_cred(loader=self._loader, name=name)

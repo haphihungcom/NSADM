@@ -1,10 +1,11 @@
+"""Load dispatches from plain text files with TOML dispatch configuration.
+"""
+
 import os
 import collections
-import copy
 import json
 import logging
 import toml
-
 
 from nsadm import exceptions
 from nsadm import loader_api
@@ -102,7 +103,8 @@ def define_action(name, config, id_dont_exist):
         if config['action'] == 'remove' and id_dont_exist:
             logger.error('No dispatch id found for dispatch "%s". Will not remove it.', name)
             return 'skip'
-        elif config['action'] == 'edit' and id_dont_exist:
+
+        if config['action'] == 'edit' and id_dont_exist:
             logger.error('No dispatch id found for dispatch "%s". Will not edit it.', name)
             return 'skip'
 
@@ -111,8 +113,8 @@ def define_action(name, config, id_dont_exist):
     if id_dont_exist:
         logger.debug('No dispatch id found for dispatch "%s". Will attempt to create the dispatch.', name)
         return 'create'
-    else:
-        return 'edit'
+
+    return 'edit'
 
 
 def merge_with_id_store(dispatch_config, id_store):
@@ -190,6 +192,7 @@ class FileDispatchLoader():
         dispatch_config (dict): Dispatch config
         file_ext (str): Dispatch file extension
     """
+
     def __init__(self, id_store, dispatch_config, template_path, file_ext):
         self.id_store = id_store
         self.dispatch_config = dispatch_config
@@ -214,21 +217,31 @@ class FileDispatchLoader():
         try:
             with open(file_path) as f:
                 text = f.read()
-        except FileNotFoundError:
+        except FileNotFoundError as err:
             logger.error('Could not found dispatch template file "%s".', file_path)
-            raise exceptions.LoaderError
+            raise exceptions.LoaderError from err
 
         return text
 
     def add_new_dispatch_id(self, name, dispatch_id):
+        """Add id of new dispatch into id store.
+
+        Args:
+            name (str): Dispatch name
+            dispatch_id (str): Dispatch id
+        """
+
         self.id_store[name] = dispatch_id
 
     def save_id_store(self):
+        """Save all changes to id store.
+        """
+
         self.id_store.save()
 
 
 @loader_api.dispatch_loader
-def init_loader(config):
+def init_dispatch_loader(config):
     this_config = config['file_dispatchloader']
 
     dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
@@ -266,5 +279,5 @@ def add_dispatch_id(loader, name, dispatch_id):
 
 
 @loader_api.dispatch_loader
-def cleanup_loader(loader):
+def cleanup_dispatch_loader(loader):
     loader.save_id_store()

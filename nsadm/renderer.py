@@ -3,9 +3,7 @@
 
 import logging
 
-import toml
 import jinja2
-import bbcode
 
 from nsadm import exceptions
 from nsadm import bb_parser
@@ -58,9 +56,9 @@ class TemplateRenderer():
                 logger.info('Filter file not found!')
             else:
                 loaded_filters = {}
-                for filter in filters:
-                    loaded_filters[filter[0]] = filter[1]
-                    logger.debug('Loaded filter "%s"', filter[0])
+                for jinja_filter in filters:
+                    loaded_filters[jinja_filter[0]] = jinja_filter[1]
+                    logger.debug('Loaded filter "%s"', jinja_filter[0])
                 self.env.filters.update(loaded_filters)
                 logger.info('Loaded all custom filters')
 
@@ -132,4 +130,3 @@ class DispatchRenderer():
         logger.debug('Rendered dispatch "%s"', name)
 
         return rendered
-

@@ -1,6 +1,5 @@
-"""Create dispatches based on templates and upload them.
+"""Updates dispatches based on dispatch config from dispatch loader.
 """
-
 
 import logging
 
@@ -133,7 +132,8 @@ class DispatchUpdater():
         try:
             category_num, subcategory_num = get_category_number(category, subcategory)
         except exceptions.NonexistentCategoryError as err:
-            logger.error('Text %s "%s" of dispatch "%s" not found.', err.type, err.value, name)
+            logger.error('Text %s "%s" of dispatch "%s" not found.',
+                         err.category_type, err.category_value, name)
             return
 
         try:

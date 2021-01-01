@@ -1,7 +1,6 @@
 """Exceptions for NSADM-specific errors.
 """
 
-
 class NSADMError(Exception):
     """NSADM general error.
     """
@@ -50,9 +49,9 @@ class NonexistentCategoryError(DispatchUpdatingError):
     """Category or subcategory doesn't exist.
     """
 
-    def __init__(self, type, value):
-        self.type = type
-        self.value = value
+    def __init__(self, category_type, category_value):
+        self.category_type = category_type
+        self.category_value = category_value
         super().__init__()
 
 

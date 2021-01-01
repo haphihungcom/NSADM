@@ -1,9 +1,7 @@
 """Parse BBCode tags.
 """
 
-import copy
 import logging
-import inspect
 
 import toml
 import bbcode
@@ -49,9 +47,9 @@ class BBRegistry():
 
         try:
             utils.load_module(path)
-            logger.debug('Loaded complex formatter file at "{}"'.format(path))
-        except FileNotFoundError:
-            raise FileNotFoundError('Could not find complex formatter file at "{}"'.format(path))
+            logger.debug('Loaded complex formatter file at "%s"', path)
+        except FileNotFoundError as err:
+            raise FileNotFoundError('Could not find complex formatter file at "{}"'.format(path)) from err
 
         inited_formatters = []
         for formatter in cls.complex_formatters:
@@ -69,14 +67,19 @@ class BBRegistry():
 
 
 class BBFormatters():
+    """Abstract class for formatter managers.
+    """
+
     def __init__(self):
         self.formatters = []
 
     def load_formatters(self):
+        """Load formatters into list."""
+
         raise NotImplementedError
 
     def get_formatters(self):
-        """Get loaded simple formatters."""
+        """Get loaded formatters."""
 
         return self.formatters
 
@@ -178,6 +181,15 @@ class BBParserAdapter():
                                   **kwargs)
 
     def format(self, text, **kwargs):
+        """Call parser to format.
+
+        Args:
+            text (str): Text to format
+
+        Returns:
+            str: Formatted text
+        """
+
         return self.parser.format(text, **kwargs)
 
 
@@ -254,15 +266,17 @@ class BBParserLoader():
 
 
 class BBParser():
-    def __init__(self, simple_formatter_path, complex_formatter_path, complex_formatter_config_path):
-        """Render NSCode tags from custom BBCode tags.
+    """Render NSCode tags from custom BBCode tags.
 
-        Args:
-            simple_formatter_path (str): Simple formatter file path
-            complex_formatter_path (str): Complex formatter file path
-            complex_formatter_config_path (str): Complex formatter config file path
-        """
+    Args:
+        simple_formatter_path (str): Simple formatter file path
+        complex_formatter_path (str): Complex formatter file path
+        complex_formatter_config_path (str): Complex formatter config file path
+    """
 
+    def __init__(self, simple_formatter_path,
+                 complex_formatter_path,
+                 complex_formatter_config_path):
         self.simple_formatter_path = simple_formatter_path
         self.complex_formatter_path = complex_formatter_path
         self.complex_formatter_config_path = complex_formatter_config_path

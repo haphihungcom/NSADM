@@ -1,4 +1,4 @@
-""" Utilities for this plugin.
+""" Utilities.
 """
 
 import os
@@ -6,11 +6,9 @@ import collections
 import shutil
 import inspect
 import logging
-import json
 import importlib
 
 import toml
-import bs4
 import appdirs
 
 from nsadm import info
@@ -29,6 +27,7 @@ class CredManager(collections.UserDict):
     """
 
     def __init__(self, cred_loader, dispatch_api):
+        super().__init__()
         self.cred_loader = cred_loader
         self.dispatch_api = dispatch_api
 
@@ -87,17 +86,18 @@ def get_config():
     if config_path is not None:
         try:
             return get_config_from_toml(config_path)
-        except FileNotFoundError:
-            raise exceptions.ConfigError('Could not find config file {}'.format(config_path))
+        except FileNotFoundError as err:
+            raise exceptions.ConfigError('Could not find config file {}'.format(config_path)) from err
 
     config_dir_path = appdirs.user_config_dir(info.APP_NAME, info.AUTHOR)
     config_path = os.path.join(config_dir_path, info.CONFIG_NAME)
     try:
         return get_config_from_toml(config_path)
-    except FileNotFoundError:
+    except FileNotFoundError as err:
         os.mkdir(config_dir_path)
         shutil.copyfile(info.DEFAULT_CONFIG_PATH, config_path)
-        raise exceptions.ConfigError('Could not find config.toml. First time run? Created one in {}. Please edit it.'.format(config_path))
+        raise exceptions.ConfigError(('Could not find config.toml. First time run?'
+                                      'Created one in {}. Please edit it.').format(config_path)) from err
 
 
 def get_dispatch_info(dispatch_config):
@@ -114,9 +114,9 @@ def get_dispatch_info(dispatch_config):
 
     dispatch_info = {}
     for nation, dispatches in dispatch_config.items():
-        for name, info in dispatches.items():
-            info['owner_nation'] = nation
-            dispatch_info[name] = info
+        for name, config in dispatches.items():
+            config['owner_nation'] = nation
+            dispatch_info[name] = config
 
     return dispatch_info
 
@@ -133,7 +133,7 @@ def get_funcs(path):
 
 
 def load_module(path, name='module'):
-    """Load module from an absolute path.
+    """Load module from a path.
 
     Args:
         path (str): Path to module file (.py)
@@ -145,6 +145,8 @@ def load_module(path, name='module'):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return module
+
+    return None
 
 
 def add_extension(name):

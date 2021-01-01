@@ -1,3 +1,6 @@
+"""Load variables from TOML files.
+"""
+
 import logging
 
 import toml
@@ -22,7 +25,7 @@ def load_vars_from_file(path):
     """
     try:
         vars = toml.load(path)
-        logger.debug('Loaded vars file "%s"', path)
+        logger.debug('Loaded var file "%s"', path)
         return vars
     except FileNotFoundError:
         logger.error('Could not find var file "{}"'.format(path))

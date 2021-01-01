@@ -32,6 +32,8 @@ class TestJSONLoader():
 
         r = json_credloader.get_creds(loader)
 
+        json_credloader.cleanup_cred_loader(loader)
+
         assert r['nation2'] == 'hunterprime2'
 
     def test_add_cred_with_existing_file(self, mock_creds_setup):
@@ -39,6 +41,8 @@ class TestJSONLoader():
         loader = json_credloader.init_cred_loader(config)
 
         json_credloader.add_cred(loader, 'nation3', 'hunterprime3')
+
+        json_credloader.cleanup_cred_loader(loader)
 
         with open('test.json') as f:
             r = json.load(f)
@@ -51,6 +55,8 @@ class TestJSONLoader():
 
         json_credloader.add_cred(loader, 'nation1', 'hunterprime1')
 
+        json_credloader.cleanup_cred_loader(loader)
+
         with open('test.json') as f:
             r = json.load(f)
 
@@ -61,6 +67,8 @@ class TestJSONLoader():
         loader = json_credloader.init_cred_loader(config)
 
         json_credloader.remove_cred(loader, 'nation2')
+
+        json_credloader.cleanup_cred_loader(loader)
 
         with open('test.json') as f:
             r = json.load(f)

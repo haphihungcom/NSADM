@@ -1,3 +1,11 @@
+"""Information.
+"""
+
+import os
+
+import appdirs
+
+
 APP_NAME = 'nsadm'
 AUTHOR = 'ns_usovietnam'
 DESCRIPTION = 'Automatically update and format dispatches.'
@@ -7,13 +15,53 @@ DISPATCH_LOADER_PROJ = 'NSADMDispatchLoader'
 VAR_LOADER_PROJ = 'NSADMVarLoader'
 CRED_LOADER_PROJ = 'NSADMCredLoader'
 
+# Default directories
+default_dirs = appdirs.AppDirs(APP_NAME, AUTHOR)
+CONFIG_DIR = default_dirs.user_config_dir
+DATA_DIR = default_dirs.user_cache_dir
+LOGGING_DIR = default_dirs.user_log_dir
+
 # Loader plugin directory path.
-LOADER_DIR_PATH = 'loaders'
+LOADER_DIR_PATH = 'nsadm/loaders'
 
 CONFIG_ENVVAR = 'NSADM_CONFIG'
 CONFIG_NAME = 'config.toml'
 # Default general configuration path for copying to proper place
 DEFAULT_CONFIG_PATH = 'nsadm/config.toml'
+
+# Logging configuration
+LOGGING_PATH = os.path.join(LOGGING_DIR, 'nsadm_log.log')
+LOGGING_CONFIG = {
+    'version': 1,
+
+    'formatters': {
+        'NSADMFormatter': {
+            'format': '[%(asctime)s %(name)s %(levelname)s] %(message)s'
+        }
+    },
+
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'INFO',
+            'formatter': 'NSADMFormatter',
+            'stream': 'ext://sys.stdout'
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': 'DEBUG',
+            'formatter': 'NSADMFormatter',
+            'filename': LOGGING_PATH,
+            'maxBytes': 5000000,
+            'backupCount': 2
+        }
+    },
+
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['console', 'file']
+    }
+}
 
 # Category name and code reference.
 SUBCATEGORIES_1 = {'overview': '100',

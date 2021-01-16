@@ -106,10 +106,10 @@ class TestBBSimpelFormatters():
                                'render_embedded': True,
                                'newline_closes': False,
                                'same_tag_closes': True}}
-        toml_files({'tests/test.toml': formatters})
+        formatter_path = toml_files({'simple_formatters.toml': formatters})
         ins = bb_parser.BBSimpleFormatters()
 
-        ins.load_formatters('tests/test.toml')
+        ins.load_formatters(formatter_path)
 
         r = [{'tag_name': 'tag1', 'template': 'test1',
               'render_embedded': True, 'newline_closes': False},
@@ -175,14 +175,14 @@ class TestBBComplexFormatters():
     @pytest.mark.usefixtures('toml_files')
     def test_load_complex_formatters_with_config(self, mock_bb_registry, toml_files):
         formatter_config = {'test1': {'key1': 'val1'}}
-        toml_files({'tests/test.toml': formatter_config})
+        formatter_config_path = toml_files({'formatter_config.toml': formatter_config})
         ins = bb_parser.BBComplexFormatters()
 
-        ins.load_formatters(mock_bb_registry, 'test.py', 'tests/test.toml')
+        ins.load_formatters(mock_bb_registry, 'test.py', formatter_config_path)
 
         mock_bb_registry.init_complex_formatters.assert_called_with('test.py', formatter_config)
 
-    def test_load_complex_formatters_with_non_configured_complex_formatter_path(self, mock_bb_registry):
+    def test_load_complex_formatters_with_no_complex_formatter_path(self, mock_bb_registry):
         ins = bb_parser.BBComplexFormatters()
 
         ins.load_formatters(mock_bb_registry, None, None)

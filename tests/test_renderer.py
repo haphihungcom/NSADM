@@ -24,7 +24,7 @@ class TestDispatchTemplateLoader():
         loader_plugin = mock.Mock(get_dispatch_text=get_dispatch_text)
         loader = renderer.DispatchJinjaLoader(loader_plugin)
 
-        assert loader.get_source(mock.Mock(), 'Test') == ('Test text', 'Test', True)
+        assert loader.get_source(mock.Mock(), 'Test')[0] == 'Test text'
 
     def test_load_text_with_loader_error(self):
         get_dispatch_text = mock.Mock(side_effect=exceptions.LoaderError(suppress_nsadm_error=False))

@@ -20,6 +20,9 @@ class DispatchJinjaLoader(jinja2.BaseLoader):
     def __init__(self, dispatch_loader):
         self.dispatch_loader = dispatch_loader
 
+    def is_up_to_date(self):
+        return True
+
     def get_source(self, environment, template):
         try:
             text = self.dispatch_loader.get_dispatch_text(template)
@@ -28,7 +31,7 @@ class DispatchJinjaLoader(jinja2.BaseLoader):
                 logger.error('Text %s "%s" of dispatch "%s" not found.')
             raise exceptions.DispatchRenderingError from err
 
-        return text, template, True
+        return text, template, self.is_up_to_date
 
 
 class TemplateRenderer():
@@ -60,7 +63,7 @@ class TemplateRenderer():
                     loaded_filters[jinja_filter[0]] = jinja_filter[1]
                     logger.debug('Loaded filter "%s"', jinja_filter[0])
                 self.env.filters.update(loaded_filters)
-                logger.info('Loaded all custom filters')
+                logger.debug('Loaded all custom filters')
 
     def render(self, name, context):
         """Render a dispatch template.

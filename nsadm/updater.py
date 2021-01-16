@@ -86,9 +86,9 @@ class DispatchUpdater():
         try:
             if action == 'remove':
                 dispatch_id = this_dispatch_config['ns_id']
-                logger.debug('Remove dispatch "%s" with id "%s".')
+                logger.debug('Remove dispatch "%s" with id "%s".', name, dispatch_id)
                 self.remove_dispatch(dispatch_id)
-                logger.info('Removed dispatch "%s".')
+                logger.info('Removed dispatch "%s".', name)
             elif action in ('edit', 'create'):
                 self.create_or_edit_dispatch(name, action, this_dispatch_config)
             else:
@@ -149,13 +149,13 @@ class DispatchUpdater():
         if action == 'create':
             logger.debug('Create dispatch "%s" with params: %r', name, params)
             self.create_dispatch(name, params)
-            logger.info('Created dispatch "%s".')
+            logger.info('Created dispatch "%s".', name)
         elif action == 'edit':
             dispatch_id = this_dispatch_config['ns_id']
             logger.debug('Edit dispatch "%s" with id "%s" and with params: %r',
                          name, dispatch_id, params)
             self.edit_dispatch(dispatch_id, params)
-            logger.info('Edited dispatch "%s".')
+            logger.info('Edited dispatch "%s".', name)
 
     def create_dispatch(self, name, params):
         """Create a dispatch.

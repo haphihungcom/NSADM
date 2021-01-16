@@ -18,7 +18,7 @@ CRED_LOADER_PROJ = 'NSADMCredLoader'
 # Default directories
 default_dirs = appdirs.AppDirs(APP_NAME, AUTHOR)
 CONFIG_DIR = Path(default_dirs.user_config_dir)
-DATA_DIR = Path(default_dirs.user_cache_dir)
+DATA_DIR = Path(default_dirs.user_data_dir)
 LOGGING_DIR = Path(default_dirs.user_log_dir)
 
 NSADM_PATH = Path('nsadm')

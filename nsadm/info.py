@@ -1,7 +1,7 @@
 """Information.
 """
 
-import os
+from pathlib import Path
 
 import appdirs
 
@@ -17,20 +17,22 @@ CRED_LOADER_PROJ = 'NSADMCredLoader'
 
 # Default directories
 default_dirs = appdirs.AppDirs(APP_NAME, AUTHOR)
-CONFIG_DIR = default_dirs.user_config_dir
-DATA_DIR = default_dirs.user_cache_dir
-LOGGING_DIR = default_dirs.user_log_dir
+CONFIG_DIR = Path(default_dirs.user_config_dir)
+DATA_DIR = Path(default_dirs.user_cache_dir)
+LOGGING_DIR = Path(default_dirs.user_log_dir)
+
+NSADM_PATH = Path('nsadm')
 
 # Loader plugin directory path.
-LOADER_DIR_PATH = 'nsadm/loaders'
+LOADER_DIR_PATH = NSADM_PATH / 'loaders'
 
 CONFIG_ENVVAR = 'NSADM_CONFIG'
 CONFIG_NAME = 'config.toml'
 # Default general configuration path for copying to proper place
-DEFAULT_CONFIG_PATH = 'nsadm/config.toml'
+DEFAULT_CONFIG_PATH =  NSADM_PATH / CONFIG_NAME
 
 # Logging configuration
-LOGGING_PATH = os.path.join(LOGGING_DIR, 'nsadm_log.log')
+LOGGING_PATH = LOGGING_DIR / 'nsadm_log.log'
 LOGGING_CONFIG = {
     'version': 1,
 

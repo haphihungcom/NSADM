@@ -72,8 +72,11 @@ def get_config_from_toml(config_path):
         return toml.load(f)
 
 
-def get_config():
-    """Get general config.
+def get_config_from_env(config_path):
+    """Get configuration defined in environment.
+
+    Args:
+        config_path (str): Full path to config file
 
     Raises:
         exceptions.ConfigError: Could not find config file
@@ -82,20 +85,33 @@ def get_config():
         dict: Config
     """
 
-    config_path = os.getenv(info.CONFIG_ENVVAR)
-    if config_path is not None:
-        try:
-            return get_config_from_toml(config_path)
-        except FileNotFoundError as err:
-            raise exceptions.ConfigError('Could not find config file {}'.format(config_path)) from err
-
-    config_dir_path = appdirs.user_config_dir(info.APP_NAME, info.AUTHOR)
-    config_path = os.path.join(config_dir_path, info.CONFIG_NAME)
     try:
         return get_config_from_toml(config_path)
     except FileNotFoundError as err:
-        os.mkdir(config_dir_path)
-        shutil.copyfile(info.DEFAULT_CONFIG_PATH, config_path)
+        raise exceptions.ConfigError('Could not find config file {}'.format(config_path)) from err
+
+
+def get_config_default(config_dir, default_config_path, config_name):
+    """Get config from default location.
+    Create default config file if there is none.
+
+    Args:
+        config_dir (pathlib.Path): [description]
+        default_config_path (pathlib.Path): [description]
+        config_name (pathlib.Path): [description]
+
+    Raises:
+        exceptions.ConfigError: Could not find config file
+
+    Returns:
+        dict: Config
+    """
+
+    config_path = config_dir / config_name
+    try:
+        return get_config_from_toml(config_path)
+    except FileNotFoundError as err:
+        shutil.copyfile(default_config_path , config_path)
         raise exceptions.ConfigError(('Could not find config.toml. First time run?'
                                       'Created one in {}. Please edit it.').format(config_path)) from err
 

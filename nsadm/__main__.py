@@ -1,5 +1,6 @@
 """NationStates Automatic Dispatch Manager."""
 
+import os
 import logging.config
 from nsadm import info
 os.makedirs(info.LOGGING_DIR, exist_ok=True)
@@ -158,8 +159,15 @@ def main():
 
     inputs = cli()
 
+    env_var = os.getenv(info.CONFIG_ENVVAR)
+
     try:
-        config = utils.get_config()
+        if env_var is not None:
+            config = utils.get_config_from_env(env_var)
+        else:
+            config = utils.get_config_default(info.CONFIG_DIR,
+                                              info.DEFAULT_CONFIG_PATH,
+                                              info.CONFIG_NAME)
         logger.info('Loaded general config.')
     except exceptions.ConfigError as err:
         print(err)

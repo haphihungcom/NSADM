@@ -74,40 +74,31 @@ class TestGetDispatchInfo():
                                    'owner_nation': 'nation2'}}
 
 
-class TestGetConfig():
-    @mock.patch('os.getenv')
-    def test_config_with_env(self, mock_getenv, toml_files):
-        toml_files({'test_config.toml': {'testkey': 'testval'}})
-        mock_getenv.return_value = 'test_config.toml'
+class TestGetConfigFromEnv():
+    def test_with_env(self, toml_files):
+        config_path = toml_files({'test_config.toml': {'testkey': 'testval'}})
 
-        r = utils.get_config()
+        r = utils.get_config_from_env(config_path)
 
         assert r == {'testkey': 'testval'}
 
-    @mock.patch('os.getenv')
-    def test_config_with_env_and_non_existing_config_file(self, mock_getenv):
-        mock_getenv.return_value = 'test_config.toml'
+    def test_with_env_and_non_existing_config_file(self):
 
         with pytest.raises(exceptions.ConfigError):
-            utils.get_config()
+            utils.get_config_from_env('abcd.toml')
 
-    @mock.patch('appdirs.user_config_dir')
-    def test_config_with_no_env_and_existing_config_file(self, mock_appdir, toml_files):
-        toml_files({info.CONFIG_NAME: {'testkey': 'testval'}})
-        mock_appdir.return_value = ''
 
-        r = utils.get_config()
+class TestGetConfigDefault():
+    def test_with_existing_config_file(self, toml_files):
+        config_path = toml_files({info.CONFIG_NAME: {'testkey': 'testval'}})
+
+        r = utils.get_config_default(config_path.parent, info.DEFAULT_CONFIG_PATH, info.CONFIG_NAME)
 
         assert r == {'testkey': 'testval'}
 
-    @mock.patch('appdirs.user_config_dir')
-    def test_config_with_no_env_and_non_existing_config_file(self, mock_appdir):
-        mock_appdir.return_value = 'test_folder'
-
+    def test_with_non_existing_config_file(self,  tmpdir):
         with pytest.raises(exceptions.ConfigError):
-            utils.get_config()
+            utils.get_config_default(tmpdir, info.DEFAULT_CONFIG_PATH, info.CONFIG_NAME)
 
-        config_path = os.path.join('test_folder', info.CONFIG_NAME)
-        assert os.path.isfile(config_path)
-
-        shutil.rmtree('test_folder')
+        config_path = tmpdir / info.CONFIG_NAME
+        assert config_path.exists()

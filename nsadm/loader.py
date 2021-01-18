@@ -116,7 +116,9 @@ class DispatchLoader(PersistentLoader):
         return self.manager.hook.get_dispatch_text(loader=self._loader, name=name)
 
     def add_dispatch_id(self, name, dispatch_id):
-        return self.manager.hook.add_dispatch_id(loader=self._loader, name=name, dispatch_id=dispatch_id)
+        return self.manager.hook.add_dispatch_id(loader=self._loader,
+                                                 name=name,
+                                                 dispatch_id=dispatch_id)
 
 
 class CredLoader(PersistentLoader):

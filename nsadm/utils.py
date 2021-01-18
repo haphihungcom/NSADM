@@ -1,7 +1,6 @@
 """ Utilities.
 """
 
-import os
 import collections
 import shutil
 import inspect
@@ -9,9 +8,7 @@ import logging
 import importlib
 
 import toml
-import appdirs
 
-from nsadm import info
 from nsadm import exceptions
 
 
@@ -58,25 +55,11 @@ class CredManager(collections.UserDict):
         self.cred_loader.remove_cred(nation_name)
 
 
-def get_config_from_toml(config_path):
-    """Get config from a TOML file.
-
-    Args:
-        config_path (str): File path
-
-    Returns:
-        dict: Config
-    """
-
-    with open(config_path) as f:
-        return toml.load(f)
-
-
 def get_config_from_env(config_path):
     """Get configuration defined in environment.
 
     Args:
-        config_path (str): Full path to config file
+        config_path (pathlib.Path): Full path to config file
 
     Raises:
         exceptions.ConfigError: Could not find config file
@@ -86,7 +69,7 @@ def get_config_from_env(config_path):
     """
 
     try:
-        return get_config_from_toml(config_path)
+        return toml.load(config_path)
     except FileNotFoundError as err:
         raise exceptions.ConfigError('Could not find config file {}'.format(config_path)) from err
 
@@ -109,7 +92,7 @@ def get_config_default(config_dir, default_config_path, config_name):
 
     config_path = config_dir / config_name
     try:
-        return get_config_from_toml(config_path)
+        return toml.load(config_path)
     except FileNotFoundError as err:
         shutil.copyfile(default_config_path , config_path)
         raise exceptions.ConfigError(('Could not find config.toml. First time run?'

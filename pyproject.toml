@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "nsadm"
+version = "0.0.1"
+description = "A tool to manage and format NationStates dispatches."
+authors = ["watarinishin <watarinishin@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+nationstates = "~3.0.1"
+toml = "~0.10.2"
+bbcode = "~1.1.0"
+Jinja2 = "~2.11.2"
+appdirs = "~1.4.4"
+pluggy = "~0.13.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.1"
+coverage = "^5.3.1"
+pytest-cov = "^2.10.1"
+mock = "^4.0.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+nsadm = "nsadm.__main__:main"

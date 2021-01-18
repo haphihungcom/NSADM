@@ -11,7 +11,8 @@ from nsadm import info
 from nsadm import exceptions
 from nsadm import loader_api
 
-ID_STORE_FILENAME = 'dispatch_id.json'
+DEFAULT_ID_STORE_FILENAME = 'dispatch_id.json'
+DEFAULT_EXT = '.txt'
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ class IDStore(collections.UserDict):
 
     def __init__(self, id_store_path):
         if id_store_path is None:
-            self.id_store_path = pathlib.Path(info.DATA_DIR, ID_STORE_FILENAME)
+            self.id_store_path = pathlib.Path(info.DATA_DIR, DEFAULT_ID_STORE_FILENAME)
         else:
             self.id_store_path = pathlib.Path(id_store_path)
         self.saved = False
@@ -264,7 +265,7 @@ def init_dispatch_loader(config):
 
     loader = FileDispatchLoader(id_store, dispatch_config,
                                 this_config['template_path'],
-                                this_config['file_ext'])
+                                this_config.get('file_ext', DEFAULT_EXT))
 
     return loader
 

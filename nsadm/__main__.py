@@ -1,17 +1,16 @@
 """NationStates Automatic Dispatch Manager."""
 
 import os
-import logging.config
-from nsadm import info
-os.makedirs(info.LOGGING_DIR, exist_ok=True)
-logging.config.dictConfig(info.LOGGING_CONFIG)
-
 import argparse
 import logging
+import logging.config
+
+from nsadm import info
+
+logging.config.dictConfig(info.LOGGING_CONFIG)
 
 import nationstates
 
-from nsadm import info
 from nsadm import exceptions
 from nsadm import api_adapter
 from nsadm import loader
@@ -44,13 +43,14 @@ class NSADM():
 
         bb_config = config['bbcode']
         template_config= config['template_renderer']
-        self.renderer = renderer.DispatchRenderer(self.dispatch_loader, self.var_loader, bb_config,
-                                                  template_config)
+        self.renderer = renderer.DispatchRenderer(self.dispatch_loader, self.var_loader,
+                                                  bb_config, template_config)
 
         self.cred_loader = loader.CredLoader(plugin_options['cred_loader'], loader_config)
         self.creds = utils.CredManager(self.cred_loader, dispatch_api)
 
-        self.updater = updater.DispatchUpdater(dispatch_api, self.creds, self.renderer, self.dispatch_loader)
+        self.updater = updater.DispatchUpdater(dispatch_api, self.creds,
+                                               self.renderer, self.dispatch_loader)
 
     def load(self, only_cred=False):
         """Load all loaders and the renderer.
@@ -172,6 +172,8 @@ def main():
     except exceptions.ConfigError as err:
         print(err)
         return
+
+    info.LOGGING_DIR.mkdir(exist_ok=True)
 
     try:
         app = NSADM(config)

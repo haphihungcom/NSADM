@@ -1,7 +1,4 @@
 *.code-workspace
-*.txt
-*.json
-*.toml
 .coverage
 __pycache__/
 templates/

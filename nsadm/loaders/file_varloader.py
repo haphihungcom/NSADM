@@ -44,16 +44,13 @@ def get_all_vars(paths):
 
     loaded_vars = {}
 
-    if isinstance(paths, list):
-        if not paths:
-            logger.debug('No var file found')
-        else:
-            for path in paths:
-                file_vars = load_vars_from_file(path)
-                if file_vars:
-                    loaded_vars.update(file_vars)
-    elif paths == '':
+    if not paths or paths == '':
         logger.debug('No var file found')
+    elif isinstance(paths, list):
+        for path in paths:
+            file_vars = load_vars_from_file(path)
+            if file_vars is not None:
+                loaded_vars.update(file_vars)
     else:
         loaded_vars = load_vars_from_file(paths)
 

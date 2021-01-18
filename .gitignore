@@ -1,6 +1,3 @@
 *.code-workspace
 .coverage
 __pycache__/
-templates/
-nsadm/config/
-nsadm/templates/

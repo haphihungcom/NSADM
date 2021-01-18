@@ -20,9 +20,6 @@ class DispatchJinjaLoader(jinja2.BaseLoader):
     def __init__(self, dispatch_loader):
         self.dispatch_loader = dispatch_loader
 
-    def is_up_to_date(self):
-        return True
-
     def get_source(self, environment, template):
         try:
             text = self.dispatch_loader.get_dispatch_text(template)

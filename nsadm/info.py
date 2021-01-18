@@ -7,7 +7,7 @@ import appdirs
 
 
 APP_NAME = 'nsadm'
-AUTHOR = 'ns_usovietnam'
+AUTHOR = 'ns_tsp_usovietnam'
 DESCRIPTION = 'Automatically update and format dispatches.'
 
 # Pluggy project name for loader plugins.

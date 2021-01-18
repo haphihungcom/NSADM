@@ -5,10 +5,11 @@ import collections
 import json
 import logging
 
-import appdirs
-
 from nsadm import info
 from nsadm import loader_api
+
+
+CRED_FILENAME = 'creds.json'
 
 
 logger = logging.getLogger(__name__)
@@ -19,23 +20,13 @@ class JSONCredLoader(collections.UserDict):
 
     Args:
         config (dict): Configuration
+        json_path (str): Path to JSON file
     """
 
-    def __init__(self, config):
+    def __init__(self, json_path):
         super().__init__()
-        self.config = config
-        self.json_path = None
+        self.json_path = json_path
         self.saved = True
-
-    def set_path(self):
-        """Set JSON file path. Use system default
-        if none is provided in config.
-        """
-
-        if not 'cred_path' in self.config:
-            self.json_path = appdirs.user_data_dir(info.APP_NAME, info.AUTHOR)
-        else:
-            self.json_path = self.config['cred_path']
 
     def load_creds(self):
         """Get all login credentials
@@ -82,9 +73,13 @@ class JSONCredLoader(collections.UserDict):
 
 @loader_api.cred_loader
 def init_cred_loader(config):
-    config = config['json_credloader']
-    loader = JSONCredLoader(config)
-    loader.set_path()
+    config = config.get('json_credloader')
+    if config is None or not 'cred_path' in config:
+        json_path = info.DATA_DIR / CRED_FILENAME
+    else:
+        json_path = config['cred_path']
+
+    loader = JSONCredLoader(json_path)
     loader.load_creds()
 
     return loader

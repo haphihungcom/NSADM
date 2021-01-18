@@ -1,15 +1,17 @@
 """Load dispatches from plain text files with TOML dispatch configuration.
 """
 
-import os
+import pathlib
 import collections
 import json
 import logging
 import toml
 
+from nsadm import info
 from nsadm import exceptions
 from nsadm import loader_api
 
+ID_STORE_FILENAME = 'dispatch_id.json'
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +25,9 @@ class IDStore(collections.UserDict):
 
     def __init__(self, id_store_path):
         if id_store_path is None:
-            pass
-        self.id_store_path = id_store_path
+            self.id_store_path = pathlib.Path(info.DATA_DIR, ID_STORE_FILENAME)
+        else:
+            self.id_store_path = pathlib.Path(id_store_path)
         self.saved = False
         super().__init__()
 
@@ -111,7 +114,8 @@ def define_action(name, config, id_dont_exist):
         return config['action']
 
     if id_dont_exist:
-        logger.debug('No dispatch id found for dispatch "%s". Will attempt to create the dispatch.', name)
+        logger.debug(('No dispatch id found for dispatch "%s".'
+                      'Will attempt to create the dispatch.'), name)
         return 'create'
 
     return 'edit'
@@ -172,15 +176,16 @@ def load_dispatch_config(dispatch_config_path):
         dict: Dispatch configuration
     """
 
-    if isinstance(dispatch_config_path, str):
-        dispatches = toml.load(dispatch_config_path)
-        logger.info('Loaded dispatch config: "%r"', dispatches)
-    elif isinstance(dispatch_config_path, list):
-        dispatches = {}
+    dispatches = {}
+    if isinstance(dispatch_config_path, list):
         for dispatch_config in dispatch_config_path:
             dispatches.update(toml.load(dispatch_config))
             logger.debug('Loaded dispatch config: "%r"', dispatches)
         logger.info('Loaded all dispatch config files')
+    else:
+        dispatches = toml.load(dispatch_config_path)
+        logger.debug('Loaded dispatch config: "%r"', dispatches)
+
     return dispatches
 
 
@@ -212,16 +217,12 @@ class FileDispatchLoader():
             str: Text
         """
 
-        filename = '{}.{}'.format(name, self.file_ext)
-        file_path = os.path.join(self.template_path, filename)
+        file_path = pathlib.Path(self.template_path, name).with_suffix(self.file_ext)
         try:
-            with open(file_path) as f:
-                text = f.read()
+            return file_path.read_text()
         except FileNotFoundError as err:
-            logger.error('Could not found dispatch template file "%s".', file_path)
+            logger.error('Could not find dispatch template file "%s".', file_path)
             raise exceptions.LoaderError from err
-
-        return text
 
     def add_new_dispatch_id(self, name, dispatch_id):
         """Add id of new dispatch into id store.
@@ -242,18 +243,23 @@ class FileDispatchLoader():
 
 @loader_api.dispatch_loader
 def init_dispatch_loader(config):
-    this_config = config['file_dispatchloader']
+    this_config = config.get('file_dispatchloader')
+    if this_config is None:
+        raise exceptions.LoaderError('File dispatch loader does not have config.')
 
-    dispatch_config = load_dispatch_config(this_config['dispatch_config_paths'])
+    dispatch_config_paths = this_config.get('dispatch_config_paths')
+    if dispatch_config_paths is None:
+        raise exceptions.LoaderError('There is no dispatch config!')
+    dispatch_config = load_dispatch_config(dispatch_config_paths)
     if not dispatch_config:
         logger.error('Dispatch config is empty!')
 
-    id_store = IDStore(this_config['id_store_path'])
+    id_store = IDStore(this_config.get('id_store_path'))
     id_store.load_from_json()
 
     dispatch_config = merge_with_id_store(dispatch_config, id_store)
 
-    if this_config['save_config_defined_id']:
+    if this_config.get('save_config_defined_id', False):
         id_store.load_from_dispatch_config(dispatch_config)
 
     loader = FileDispatchLoader(id_store, dispatch_config,

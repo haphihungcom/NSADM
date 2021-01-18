@@ -96,9 +96,9 @@ class TestGetConfigDefault():
 
         assert r == {'testkey': 'testval'}
 
-    def test_with_non_existing_config_file(self,  tmpdir):
+    def test_with_non_existing_config_file(self,  tmp_path):
         with pytest.raises(exceptions.ConfigError):
-            utils.get_config_default(tmpdir, info.DEFAULT_CONFIG_PATH, info.CONFIG_NAME)
+            utils.get_config_default(tmp_path, info.DEFAULT_CONFIG_PATH, info.CONFIG_NAME)
 
-        config_path = tmpdir / info.CONFIG_NAME
+        config_path = tmp_path / info.CONFIG_NAME
         assert config_path.exists()

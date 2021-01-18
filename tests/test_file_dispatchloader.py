@@ -308,7 +308,7 @@ class TestFileDispatchLoaderObj():
     def test_get_dispatch_text_with_non_existing_file(self, tmp_path):
         obj = file_dispatchloader.FileDispatchLoader({}, {}, tmp_path, '.txt')
 
-        with pytest.raises(exceptions.LoaderError):
+        with pytest.raises(exceptions.DispatchTextNotFound):
             obj.get_dispatch_text('test2')
 
 

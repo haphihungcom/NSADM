@@ -20,6 +20,11 @@ class LoaderError(NSADMError):
         super().__init__()
 
 
+class DispatchTextNotFound(LoaderError):
+    """Dispatch text not found error.
+    """
+
+
 class DispatchAPIError(NSADMError):
     """Dispatch API error.
     """

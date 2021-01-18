@@ -26,12 +26,12 @@ class DispatchJinjaLoader(jinja2.BaseLoader):
     def get_source(self, environment, template):
         try:
             text = self.dispatch_loader.get_dispatch_text(template)
-        except exceptions.LoaderError as err:
+        except exceptions.DispatchTextNotFound as err:
             if not err.suppress_nsadm_error:
                 logger.error('Text %s "%s" of dispatch "%s" not found.')
             raise exceptions.DispatchRenderingError from err
 
-        return text, template, self.is_up_to_date
+        return text, template, lambda: True
 
 
 class TemplateRenderer():
